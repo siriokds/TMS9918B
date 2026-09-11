@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="489.59999999999997" height="138" preserveAspectRatio="xMinYMin meet" viewBox="0 0 489 138" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>...</title>
+	<desc>...</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="489.59999999999997" height="138"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-138)" style="clip-path: url(#clip)">
+		<g transform="">
+			<path d="M 62,12 L 62,122 Z" style="stroke: rgb(82%,82%,82%); stroke-linecap: butt; stroke-width: 0.4;"/>
+			<text x="60.332" y="2" style="font-family: Helvetica; font-size: 6px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,4) scale(1,-1)">0</text>
+			<path d="M 114.2,12 L 114.2,122 Z" style="stroke: rgb(82%,82%,82%); stroke-linecap: butt; stroke-width: 0.4;"/>
+			<text x="112.53199999999998" y="2" style="font-family: Helvetica; font-size: 6px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,4) scale(1,-1)">1</text>
+			<path d="M 166.4,12 L 166.4,122 Z" style="stroke: rgb(82%,82%,82%); stroke-linecap: butt; stroke-width: 0.4;"/>
+			<text x="164.73199999999997" y="2" style="font-family: Helvetica; font-size: 6px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,4) scale(1,-1)">2</text>
+			<path d="M 218.6,12 L 218.6,122 Z" style="stroke: rgb(82%,82%,82%); stroke-linecap: butt; stroke-width: 0.4;"/>
+			<text x="216.932" y="2" style="font-family: Helvetica; font-size: 6px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,4) scale(1,-1)">3</text>
+			<path d="M 270.8,12 L 270.8,122 Z" style="stroke: rgb(82%,82%,82%); stroke-linecap: butt; stroke-width: 0.4;"/>
+			<text x="269.13199999999995" y="2" style="font-family: Helvetica; font-size: 6px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,4) scale(1,-1)">4</text>
+			<path d="M 323,12 L 323,122 Z" style="stroke: rgb(82%,82%,82%); stroke-linecap: butt; stroke-width: 0.4;"/>
+			<text x="321.332" y="2" style="font-family: Helvetica; font-size: 6px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,4) scale(1,-1)">5</text>
+			<path d="M 375.2,12 L 375.2,122 Z" style="stroke: rgb(82%,82%,82%); stroke-linecap: butt; stroke-width: 0.4;"/>
+			<text x="373.532" y="2" style="font-family: Helvetica; font-size: 6px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,4) scale(1,-1)">6</text>
+			<path d="M 427.4,12 L 427.4,122 Z" style="stroke: rgb(82%,82%,82%); stroke-linecap: butt; stroke-width: 0.4;"/>
+			<text x="425.73199999999997" y="2" style="font-family: Helvetica; font-size: 6px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,4) scale(1,-1)">7</text>
+			<path d="M 479.6,12 L 479.6,122 Z" style="stroke: rgb(82%,82%,82%); stroke-linecap: butt; stroke-width: 0.4;"/>
+			<text x="477.93199999999996" y="2" style="font-family: Helvetica; font-size: 6px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,4) scale(1,-1)">8</text>
+			<text x="2" y="105" style="font-family: Helvetica-Bold; font-size: 7px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,210) scale(1,-1)">RAS</text>
+			<text x="2" y="79" style="font-family: Helvetica-Bold; font-size: 7px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,158) scale(1,-1)">CAS</text>
+			<text x="2" y="53" style="font-family: Helvetica-Bold; font-size: 7px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,106) scale(1,-1)">AD (address)</text>
+			<text x="2" y="27" style="font-family: Helvetica-Bold; font-size: 7px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,54) scale(1,-1)">RD (data in)</text>
+			<polyline points="62 112, 62 102, 270.8 102, 270.8 112, 427.4 112, 427.4 102, 479.6 102" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 1.1; fill: None; fill-rule: evenodd;"/>
+			<polyline points="62 86, 114.2 86, 114.2 76, 270.8 76, 270.8 86, 479.6 86" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 1.1; fill: None; fill-rule: evenodd;"/>
+			<rect x="63.0" y="49" width="50.19999999999999" height="12" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 0.8; fill: none; fill-rule: evenodd;"/>
+			<text x="83.267" y="52" style="font-family: Helvetica; font-size: 6px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,104) scale(1,-1)">row</text>
+			<rect x="115.19999999999999" y="49" width="154.59999999999997" height="12" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 0.8; fill: none; fill-rule: evenodd;"/>
+			<text x="182.83099999999996" y="52" style="font-family: Helvetica; font-size: 6px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,104) scale(1,-1)">column</text>
+			<path d="M 270.8,22 L 270.8,44 Z" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 1.4;"/>
+			<text x="272.79999999999995" y="26" style="font-family: Helvetica; font-size: 6px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,52) scale(1,-1)">sample</text>
+		</g>
+	</g>
+</svg>

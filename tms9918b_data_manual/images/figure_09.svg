@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="489.59999999999997" height="60" preserveAspectRatio="xMinYMin meet" viewBox="0 0 489 60" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>...</title>
+	<desc>...</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="489.59999999999997" height="60"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-60)" style="clip-path: url(#clip)">
+		<g transform="">
+			<rect x="4.0" y="16" width="220.73333333333332" height="28" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 0.7; fill: rgb(75%,75%,75%); fill-rule: evenodd;"/>
+			<text x="91.08066666666666" y="27.0" style="font-family: Helvetica; font-size: 6px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,54) scale(1,-1)">char|colour x2 (4)</text>
+			<rect x="224.73333333333332" y="16" width="70.23333333333332" height="28" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 0.7; fill: rgb(100%,100%,100%); fill-rule: evenodd;"/>
+			<text x="253.51700000000002" y="27.0" style="font-family: Helvetica; font-size: 6px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,54) scale(1,-1)">CPU</text>
+			<rect x="294.96666666666664" y="16" width="70.23333333333335" height="28" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 0.7; fill: rgb(55%,55%,55%); fill-rule: evenodd;"/>
+			<text x="325.9133333333333" y="27.0" style="font-family: Helvetica; font-size: 6px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,54) scale(1,-1)">pat</text>
+			<rect x="365.2" y="16" width="70.23333333333335" height="28" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 0.7; fill: rgb(55%,55%,55%); fill-rule: evenodd;"/>
+			<text x="396.14666666666665" y="27.0" style="font-family: Helvetica; font-size: 6px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,54) scale(1,-1)">pat</text>
+			<path d="M 4,12 L 4,16 Z" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 0.5;"/>
+			<text x="0.8649999999999998" y="3" style="font-family: Helvetica; font-size: 5.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,6) scale(1,-1)">+0</text>
+			<path d="M 44.133333,12 L 44.133333,16 Z" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 0.5;"/>
+			<text x="40.998333333333335" y="3" style="font-family: Helvetica; font-size: 5.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,6) scale(1,-1)">+4</text>
+			<path d="M 84.266667,12 L 84.266667,16 Z" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 0.5;"/>
+			<text x="81.13166666666666" y="3" style="font-family: Helvetica; font-size: 5.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,6) scale(1,-1)">+8</text>
+			<path d="M 124.4,12 L 124.4,16 Z" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 0.5;"/>
+			<text x="119.736" y="3" style="font-family: Helvetica; font-size: 5.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,6) scale(1,-1)">+12</text>
+			<path d="M 164.533333,12 L 164.533333,16 Z" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 0.5;"/>
+			<text x="159.86933333333334" y="3" style="font-family: Helvetica; font-size: 5.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,6) scale(1,-1)">+16</text>
+			<path d="M 204.666667,12 L 204.666667,16 Z" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 0.5;"/>
+			<text x="200.00266666666667" y="3" style="font-family: Helvetica; font-size: 5.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,6) scale(1,-1)">+20</text>
+			<path d="M 244.8,12 L 244.8,16 Z" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 0.5;"/>
+			<text x="240.13600000000002" y="3" style="font-family: Helvetica; font-size: 5.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,6) scale(1,-1)">+24</text>
+			<path d="M 284.933333,12 L 284.933333,16 Z" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 0.5;"/>
+			<text x="280.26933333333335" y="3" style="font-family: Helvetica; font-size: 5.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,6) scale(1,-1)">+28</text>
+			<path d="M 325.066667,12 L 325.066667,16 Z" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 0.5;"/>
+			<text x="320.4026666666667" y="3" style="font-family: Helvetica; font-size: 5.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,6) scale(1,-1)">+32</text>
+			<path d="M 365.2,12 L 365.2,16 Z" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 0.5;"/>
+			<text x="360.536" y="3" style="font-family: Helvetica; font-size: 5.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,6) scale(1,-1)">+36</text>
+			<path d="M 405.333333,12 L 405.333333,16 Z" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 0.5;"/>
+			<text x="400.6693333333333" y="3" style="font-family: Helvetica; font-size: 5.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,6) scale(1,-1)">+40</text>
+			<path d="M 445.466667,12 L 445.466667,16 Z" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 0.5;"/>
+			<text x="440.80266666666665" y="3" style="font-family: Helvetica; font-size: 5.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,6) scale(1,-1)">+44</text>
+			<path d="M 485.6,12 L 485.6,16 Z" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 0.5;"/>
+			<text x="480.93600000000004" y="3" style="font-family: Helvetica; font-size: 5.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,6) scale(1,-1)">+48</text>
+		</g>
+	</g>
+</svg>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="489.59999999999997" height="160" preserveAspectRatio="xMinYMin meet" viewBox="0 0 489 160" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>...</title>
+	<desc>...</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="489.59999999999997" height="160"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-160)" style="clip-path: url(#clip)">
+		<g transform="">
+			<rect x="0" y="60" width="80" height="44" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 1; fill: none; fill-rule: evenodd;"/>
+			<text x="32.08375" y="84.0" style="font-family: Helvetica-Bold; font-size: 7.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,168) scale(1,-1)">CPU</text>
+			<text x="34.40025" y="73.0" style="font-family: Helvetica; font-size: 6.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,146) scale(1,-1)">Z80</text>
+			<rect x="185" y="50" width="110" height="64" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 1; fill: none; fill-rule: evenodd;"/>
+			<text x="221.03625" y="84.0" style="font-family: Helvetica-Bold; font-size: 7.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,168) scale(1,-1)">TMS9918B</text>
+			<text x="233.318" y="73.0" style="font-family: Helvetica; font-size: 6.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,146) scale(1,-1)">VDP</text>
+			<rect x="395" y="105" width="90" height="44" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 1; fill: none; fill-rule: evenodd;"/>
+			<text x="428.96" y="129.0" style="font-family: Helvetica-Bold; font-size: 7.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,258) scale(1,-1)">VRAM</text>
+			<text x="412.17674999999997" y="118.0" style="font-family: Helvetica; font-size: 6.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,236) scale(1,-1)">8 x 16K x 1, 120 ns</text>
+			<rect x="395" y="10" width="90" height="44" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 1; fill: none; fill-rule: evenodd;"/>
+			<text x="428.33" y="34.0" style="font-family: Helvetica-Bold; font-size: 7.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,68) scale(1,-1)">VIDEO</text>
+			<text x="420.31475" y="23.0" style="font-family: Helvetica; font-size: 6.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,46) scale(1,-1)">TV or monitor</text>
+			<path d="M 80,82 L 185,82 Z" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 1;"/>
+			<text x="107.5441" y="88" style="font-family: Helvetica; font-size: 6.2px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,176) scale(1,-1)">CD0-CD7, MODE</text>
+			<text x="109.78229999999999" y="72" style="font-family: Helvetica; font-size: 6.2px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,144) scale(1,-1)">CSR, CSW, INT</text>
+			<path d="M 295,100 L 395,127 Z" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 1;"/>
+			<text x="316.7528" y="124" style="font-family: Helvetica; font-size: 6.2px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,248) scale(1,-1)">AD0-AD7, RD0-RD7</text>
+			<text x="322.7792" y="97" style="font-family: Helvetica; font-size: 6.2px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,194) scale(1,-1)">RAS, CAS, R/W</text>
+			<path d="M 295,64 L 395,32 Z" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 1;"/>
+			<text x="328.9823" y="60" style="font-family: Helvetica; font-size: 6.2px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,120) scale(1,-1)">COMVID or</text>
+			<text x="328.9792" y="35" style="font-family: Helvetica; font-size: 6.2px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,70) scale(1,-1)">Y, R-Y, B-Y</text>
+			<text x="193.57375" y="38" style="font-family: Helvetica; font-size: 6.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,76) scale(1,-1)">XTAL1, XTAL2: 10.738635 MHz</text>
+		</g>
+	</g>
+</svg>

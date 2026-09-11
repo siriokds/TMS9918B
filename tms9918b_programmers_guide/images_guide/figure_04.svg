@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="230.4" height="178" preserveAspectRatio="xMinYMin meet" viewBox="0 0 230 178" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>...</title>
+	<desc>...</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="230.4" height="178"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-178)" style="clip-path: url(#clip)">
+		<g transform="">
+			<rect x="10" y="144" width="160.4" height="22" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 0.9; fill: none; fill-rule: evenodd;"/>
+			<text x="61.8678" y="152.0" style="font-family: Helvetica-Bold; font-size: 6.8px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,304) scale(1,-1)">PATTERN TABLE</text>
+			<text x="175.4" y="162" style="font-family: Helvetica; font-size: 6.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,324) scale(1,-1)">0000</text>
+			<rect x="10" y="122" width="160.4" height="22" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 0.9; fill: none; fill-rule: evenodd;"/>
+			<text x="56.2" y="130.0" style="font-family: Helvetica-Bold; font-size: 6.8px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,260) scale(1,-1)">CURSOR PATTERNS</text>
+			<text x="175.4" y="140" style="font-family: Helvetica; font-size: 6.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,280) scale(1,-1)">0800</text>
+			<rect x="10" y="100" width="160.4" height="22" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 0.9; fill: rgb(93%,93%,93%); fill-rule: evenodd;"/>
+			<text x="75.8452" y="108.0" style="font-family: Helvetica; font-size: 6.8px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,216) scale(1,-1)">UNUSED</text>
+			<text x="175.4" y="118" style="font-family: Helvetica; font-size: 6.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,236) scale(1,-1)">0900</text>
+			<rect x="10" y="78" width="160.4" height="22" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 0.9; fill: none; fill-rule: evenodd;"/>
+			<text x="56.393800000000006" y="86.0" style="font-family: Helvetica-Bold; font-size: 6.8px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,172) scale(1,-1)">CHARACTER TABLE</text>
+			<text x="175.4" y="96" style="font-family: Helvetica; font-size: 6.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,192) scale(1,-1)">3000</text>
+			<rect x="10" y="56" width="160.4" height="22" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 0.9; fill: rgb(93%,93%,93%); fill-rule: evenodd;"/>
+			<text x="75.8452" y="64.0" style="font-family: Helvetica; font-size: 6.8px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,128) scale(1,-1)">UNUSED</text>
+			<text x="175.4" y="74" style="font-family: Helvetica; font-size: 6.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,148) scale(1,-1)">3780</text>
+			<rect x="10" y="34" width="160.4" height="22" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 0.9; fill: none; fill-rule: evenodd;"/>
+			<text x="52.9904" y="42.0" style="font-family: Helvetica-Bold; font-size: 6.8px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,84) scale(1,-1)">CURSOR ATTRIBUTES</text>
+			<text x="175.4" y="52" style="font-family: Helvetica; font-size: 6.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,104) scale(1,-1)">3B00</text>
+			<rect x="10" y="12" width="160.4" height="22" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 0.9; fill: rgb(93%,93%,93%); fill-rule: evenodd;"/>
+			<text x="75.8452" y="20.0" style="font-family: Helvetica; font-size: 6.8px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,40) scale(1,-1)">UNUSED</text>
+			<text x="175.4" y="30" style="font-family: Helvetica; font-size: 6.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,60) scale(1,-1)">3B08</text>
+			<text x="175.4" y="10" style="font-family: Helvetica; font-size: 6.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,20) scale(1,-1)">3FFF</text>
+		</g>
+	</g>
+</svg>
