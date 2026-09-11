@@ -10,6 +10,7 @@
 	</clipPath>
 	<g id="group" transform="scale(1,-1) translate(0,-160)" style="clip-path: url(#clip)">
 		<g transform="">
+			<rect x="-6" y="-6" width="501.59999999999997" height="172" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(100%,100%,100%); fill-rule: evenodd;"/>
 			<rect x="0" y="60" width="80" height="44" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 1; fill: none; fill-rule: evenodd;"/>
 			<text x="32.08375" y="84.0" style="font-family: Helvetica-Bold; font-size: 7.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,168) scale(1,-1)">CPU</text>
 			<text x="34.40025" y="73.0" style="font-family: Helvetica; font-size: 6.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,146) scale(1,-1)">Z80</text>

@@ -53,6 +53,12 @@ class Exporter:
         self.lines = []
 
     def image(self, drawing):
+        # White background: the figures use black lines and text, which vanish on dark Markdown themes.
+        from reportlab.graphics.shapes import Rect as _Rect
+        from reportlab.lib import colors as _colors
+        pad = 6
+        drawing.insert(0, _Rect(-pad, -pad, drawing.width + 2 * pad, drawing.height + 2 * pad,
+                                fillColor=_colors.white, strokeColor=None))
         self.n += 1
         name = 'figure_%02d.svg' % self.n
         renderSVG.drawToFile(drawing, os.path.join(self.img_dir, name))
