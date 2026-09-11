@@ -8,7 +8,7 @@ After reset it is a TMS9918A, bit for bit and memory cycle for memory cycle. Beh
 palettes, extended display modes, eight sprites per line, hardware scrolling and a scanline interrupt — all of
 it verified against the data sheets of the RAMs and the timing of the original chip.
 
-> **Design study prepared for the GearSF7000 emulator. Not a Texas Instruments product.**
+> **Design study. Not a Texas Instruments product.**
 
 ## Documents
 
@@ -16,6 +16,7 @@ it verified against the data sheets of the RAMs and the timing of the original c
 |---|---|---|
 | **Data Manual** (TB-9918B-01) — hardware, registers, modes, VRAM interface, timing | [Markdown](tms9918b_data_manual/TMS9918B_Data_Manual.md) | [PDF](tms9918b_data_manual/TMS9918B_Data_Manual.pdf) |
 | **Programmer's Guide Supplement** (TB-9918B-02) — unlocking, initialization, patterns, sprites, scrolling, Z80 examples | [Markdown](tms9918b_programmers_guide/TMS9918B_Programmers_Guide_Supplement.md) | [PDF](tms9918b_programmers_guide/TMS9918B_Programmers_Guide_Supplement.pdf) |
+| **Design Notes** (TB-9918B-03) — 1983 setting, memory constraints, precedents, rejected alternatives, cost | [Markdown](tms9918b_design_notes/TMS9918B_Design_Notes.md) | [PDF](tms9918b_design_notes/TMS9918B_Design_Notes.pdf) |
 | **Model** — unit-exact VRAM calendars, DRAM verification, CPU timing, tests | [README](tms9918b_model/README.md) | — |
 
 The two manuals follow the structure and conventions of TI's own documents, the *TMS9918A/9928A/9929A Data
@@ -91,6 +92,10 @@ in 64 columns, 150 ns RAMs.
 ├── LICENSE                              Apache-2.0 (code)
 ├── LICENSE-DOCS                         CC BY 4.0 (documents)
 ├── README.md
+├── tms9918b_design_notes/
+│   ├── TMS9918B_Design_Notes.md
+│   ├── TMS9918B_Design_Notes.pdf        (13 pages)
+│   └── source/
 ├── tms9918b_data_manual/
 │   ├── TMS9918B_Data_Manual.md          Markdown edition
 │   ├── TMS9918B_Data_Manual.pdf         print edition (18 pages)
@@ -116,6 +121,7 @@ in 64 columns, 150 ns RAMs.
 ```sh
 python3 tms9918b_data_manual/source/build_datasheet.py tms9918b_data_manual/TMS9918B_Data_Manual.pdf
 python3 tms9918b_programmers_guide/source/build_guide.py tms9918b_programmers_guide/TMS9918B_Programmers_Guide_Supplement.pdf
+python3 tms9918b_design_notes/source/build_notes.py tms9918b_design_notes/TMS9918B_Design_Notes.pdf
 ```
 
 **Model** (C++17, self-contained):
@@ -136,9 +142,9 @@ g++ -std=c++17 -O2 -Isrc -Isrc/tms99xx tools/tms9918b_report.cpp src/TMS9918BCal
 | Model and tests | complete — all checks pass |
 | Data Manual | complete |
 | Programmer's Guide Supplement | complete |
-| Design Notes (history, costs, rejected alternatives) | in preparation |
+| Design Notes (history, costs, rejected alternatives) | complete |
 | Compatibility guidelines | complete |
-| GearSF7000 integration | planned |
+| Emulator integration guide | planned |
 
 Open assumptions are listed in the [model README](tms9918b_model/README.md#open-points): VDP input setup of
 40 ns with a 20 ns board delay budget, and sprite selection over line pairs.
@@ -156,7 +162,7 @@ integrating the chip in hardware and writing software around it.
 | Part | License | File |
 |---|---|---|
 | Reference model, tests, tools, document generators | Apache License 2.0 | [LICENSE](LICENSE) |
-| Data Manual, Programmer's Guide Supplement, README and guideline files | Creative Commons Attribution 4.0 (CC BY 4.0) | [LICENSE-DOCS](LICENSE-DOCS) |
+| Data Manual, Programmer's Guide Supplement, Design Notes, README and guideline files | Creative Commons Attribution 4.0 (CC BY 4.0) | [LICENSE-DOCS](LICENSE-DOCS) |
 | Example programs in the Programmer's Guide | CC BY 4.0 or, at your choice, Apache License 2.0 | — |
 
 Copyright 2026 Saverio Russo. TMS9918A, TMS9928A and TMS9929A are Texas Instruments part numbers, referenced for
