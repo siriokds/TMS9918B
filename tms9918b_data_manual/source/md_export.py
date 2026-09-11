@@ -59,6 +59,11 @@ class Exporter:
         pad = 6
         drawing.insert(0, _Rect(-pad, -pad, drawing.width + 2 * pad, drawing.height + 2 * pad,
                                 fillColor=_colors.white, strokeColor=None))
+        # Enlarge for on-screen reading: up to three times the print size, at most 900 px wide.
+        scale = max(1.5, min(3.0, 900.0 / drawing.width))
+        drawing.scale(scale, scale)
+        drawing.width *= scale
+        drawing.height *= scale
         self.n += 1
         name = 'figure_%02d.svg' % self.n
         renderSVG.drawToFile(drawing, os.path.join(self.img_dir, name))

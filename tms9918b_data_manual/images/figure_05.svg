@@ -2,14 +2,14 @@
 <!DOCTYPE svg
   PUBLIC '-//W3C//DTD SVG 1.0//EN'
   'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
-<svg width="223.20000000000002" height="296" preserveAspectRatio="xMinYMin meet" viewBox="0 0 223 296" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="669.6" height="888.0" preserveAspectRatio="xMinYMin meet" viewBox="0 0 669 888" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
 	<title>...</title>
 	<desc>...</desc>
 	<clipPath id="clip">
-		<rect x="0" y="0" width="223.20000000000002" height="296"/>
+		<rect x="0" y="0" width="669.6" height="888.0"/>
 	</clipPath>
-	<g id="group" transform="scale(1,-1) translate(0,-296)" style="clip-path: url(#clip)">
-		<g transform="">
+	<g id="group" transform="scale(1,-1) translate(0,-888)" style="clip-path: url(#clip)">
+		<g transform=" matrix(3,0,0,3,0,0)">
 			<rect x="-6" y="-6" width="235.20000000000002" height="308" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(100%,100%,100%); fill-rule: evenodd;"/>
 			<rect x="85.60000000000001" y="12" width="52.000000000000014" height="268" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 1; fill: none; fill-rule: evenodd;"/>
 			<text x="92.63625" y="286" style="font-family: Helvetica-Bold; font-size: 7.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,572) scale(1,-1)">TMS9918B</text>

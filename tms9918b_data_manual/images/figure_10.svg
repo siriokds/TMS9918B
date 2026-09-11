@@ -2,14 +2,14 @@
 <!DOCTYPE svg
   PUBLIC '-//W3C//DTD SVG 1.0//EN'
   'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
-<svg width="489.59999999999997" height="60" preserveAspectRatio="xMinYMin meet" viewBox="0 0 489 60" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="900.0" height="110.29411764705883" preserveAspectRatio="xMinYMin meet" viewBox="0 0 900 110" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
 	<title>...</title>
 	<desc>...</desc>
 	<clipPath id="clip">
-		<rect x="0" y="0" width="489.59999999999997" height="60"/>
+		<rect x="0" y="0" width="900.0" height="110.29411764705883"/>
 	</clipPath>
-	<g id="group" transform="scale(1,-1) translate(0,-60)" style="clip-path: url(#clip)">
-		<g transform="">
+	<g id="group" transform="scale(1,-1) translate(0,-110)" style="clip-path: url(#clip)">
+		<g transform=" matrix(1.838235,0,0,1.838235,0,0)">
 			<rect x="-6" y="-6" width="501.59999999999997" height="72" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(100%,100%,100%); fill-rule: evenodd;"/>
 			<rect x="4.0" y="16" width="165.54999999999998" height="28" style="stroke: rgb(0%,0%,0%); stroke-linecap: butt; stroke-width: 0.7; fill: rgb(75%,75%,75%); fill-rule: evenodd;"/>
 			<text x="73.27199999999999" y="27.0" style="font-family: Helvetica; font-size: 6px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,54) scale(1,-1)">names (4)</text>
