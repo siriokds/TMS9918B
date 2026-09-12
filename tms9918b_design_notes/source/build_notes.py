@@ -220,7 +220,7 @@ def build_story(entries):
           P('Estimates per block for 1983 depletion-load NMOS, within about 50 %. For scale, the 6502 has about 3,500 transistors.'),
           table([['Block', 'Transistors'],
                  ['Memory cycle generator, bursts and calendars', '~600'],
-                 ['Unlock, R8-R15, status select, S1', '~300'],
+                 ['Unlock, R11-R15, status select, S1', '~300'],
                  ['Palette (96 bits) and luminance scaling', '~810'],
                  ['Eight sprite channels, PAIR, row latches, BANK, line-pair scan', '~1,520'],
                  ['Scroll, MASK, locks', '~750'],

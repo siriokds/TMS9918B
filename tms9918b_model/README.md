@@ -46,7 +46,7 @@ of every scan line, positioned to the half crystal period and checked against th
 | Tiles | Graphics1X, Graphics2Fat | name,attr (2) / sprite Y / pattern row (2) / name,attr (2) / CPU / pattern row (2) | 2 cells = 64 units from 212 | 29 |
 | Bitmap | Bitmap, BitmapQ | bitmap (4) / CPU / palette map (2) / sprite Y / CPU | 2 cells = 64 units from 212 | 45 |
 | Text40 | Text40X, Text40XQ | char,colour,char,colour (4) / CPU / pattern / pattern | 2 columns = 48 units from 236 | 67 |
-| Text64 | Text64, Text64Q (R13 T64) | names (4) / CPU / 4 patterns / CPU | 4 columns = 64 units from 212 | 70 |
+| Text64 | Text64, Text64Q (R12 T64) | names (4) / CPU / 4 patterns / CPU | 4 columns = 64 units from 212 | 70 |
 | Blanking (Tiles, Bitmap) | - | 8 sprites: SAT X,name,colour (3) + left + right half, 9 CPU cycles | units 1236-1579 | included |
 
 **Sprite Y scan over two lines:** 16 Y reads per line (sprites 0-15 on even lines, 16-31 on odd lines). The

@@ -24,7 +24,7 @@
  *   Text40   Text40X, Text40XQ. Two characters per 48 units:
  *            +0 char|colour|char|colour (4), +22 CPU, +29 pattern row,
  *            +36 pattern row, +43 idle 5.
- *   Text64   Text64 (R13 T64). Four 8x8 characters per 64 units from 212:
+ *   Text64   Text64 (R12 T64). Four 8x8 characters per 64 units from 212:
  *            +0 names of the 4 columns (4), +22 CPU, +29 +36 +43 +50 pattern
  *            rows, +57 CPU. Blanking: cursor sprites 0-1 and CPU cycles.
  *   Blanking (Tiles, Bitmap): CPU, then 4 groups of two sprites

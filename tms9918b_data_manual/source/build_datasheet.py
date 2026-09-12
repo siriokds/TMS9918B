@@ -142,19 +142,20 @@ def build_story(entries):
               P('INT is active (low) when F = 1 and IE = 1 (frame interrupt, as on the TMS9918A) or when FL = 1 and IE1 = 1 '
                 '(scanline interrupt, Section 2.7). Reading S0 clears F; reading S1 clears FL.'),
               H(2, '2.1.5 VDP initialization'),
-              P('RESET clears R0, R1, R8 and R13, locks the extended registers and selects status register S0. The palette and '
-                'R9 to R15 are undefined after power-up and must be written before extended modes are used.')]
+              P('RESET clears R0, R1, R11 and R12, locks the extended registers and selects status register S0. The palette and '
+                'R8 to R15 are undefined after power-up and must be written before extended modes are used.')]
 
     story += [H(1, '2.2 Write-Only Registers')]
-    story += [P('Registers R0 to R7 keep their TMS9918A functions (MP010A Section 2.2). Registers R8 to R15 exist after the unlock '
+    story += [P('Registers R0 to R7 keep their TMS9918A functions (MP010A Section 2.2). Registers R11 to R15 exist after the unlock '
                 'command. Figure 2-1 shows the extended registers; reserved bits must be written as 0.')]
     figs = [
-        ('R8 MODE', [('IE1', 1), ('0', 1), ('0', 1), ('0', 1), ('0', 1), ('0', 1), ('MX', 1), ('XE', 1)]),
-        ('R9 H SCROLL', [('COLUMNS', 5), ('FINE', 3)]),
-        ('R10 V SCROLL', [('LINES (0-191)', 8)]),
-        ('R11', [('RESERVED', 8)]),
-        ('R12 LINE COUNT', [('RELOAD VALUE', 8)]),
-        ('R13 SCREEN', [('0', 1), ('0', 1), ('0', 1), ('0', 1), ('HLOCK', 1), ('VLOCK', 1), ('MASK', 1), ('T64', 1)]),
+        ('R8 H SCROLL', [('COLUMNS', 5), ('FINE', 3)]),
+        ('R9 V SCROLL', [('LINES (0-191)', 8)]),
+        ('R10 LINE COUNT', [('RELOAD VALUE', 8)]),
+        ('R11 MODE', [('IE1', 1), ('0', 1), ('0', 1), ('0', 1), ('0', 1), ('0', 1), ('MX', 1), ('XE', 1)]),
+        ('R12 SCREEN', [('0', 1), ('0', 1), ('0', 1), ('0', 1), ('HLOCK', 1), ('VLOCK', 1), ('MASK', 1), ('T64', 1)]),
+        ('R13', [('RESERVED', 8)]),
+        ('R14', [('RESERVED', 8)]),
         ('R14', [('RESERVED', 8)]),
         ('R15 STATUS SEL', [('0', 1), ('0', 1), ('0', 1), ('0', 1), ('STATUS REGISTER NUMBER', 4)]),
     ]
@@ -162,16 +163,16 @@ def build_story(entries):
         story += [register_figure(name, cells), Spacer(1, 3)]
     story += [caption('FIGURE 2-1 - EXTENDED REGISTERS (D0 = MSB)')]
     story += [table([['Register / bit', 'Function'],
-                     ['R8 D7 XE', 'Extended enable: palette port, S1, R9-R15 and IE1 become active. With XE = 0 the VDP is a TMS9918A.'],
-                     ['R8 D6 MX', 'Extended display modes (requires XE). Selects the modes of Table 2-3 together with M1, M2, M3.'],
-                     ['R8 D0 IE1', 'Scanline interrupt enable.'],
-                     ['R9', 'World X = screen X + R9 (modulo 256). D0-D4 whole columns, D5-D7 pixels.'],
-                     ['R10', 'World line = (line + R10) modulo 192.'],
-                     ['R12', 'Scanline interrupt reload value (Section 2.7).'],
-                     ['R13 D7 T64', 'Extended text modes use 64 columns instead of 40.'],
-                     ['R13 D6 MASK', 'The leftmost 8 pixels show the backdrop colour, sprites included.'],
-                     ['R13 D5 VLOCK', 'Columns 24-31 do not scroll vertically.'],
-                     ['R13 D4 HLOCK', 'Lines 0-15 do not scroll horizontally.'],
+                     ['R8', 'World X = screen X + R8 (modulo 256). D0-D4 whole columns, D5-D7 pixels. Sampled once per line.'],
+                     ['R9', 'World line = (line + R9) modulo 192. Sampled once per line.'],
+                     ['R10', 'Scanline interrupt reload value (Section 2.7).'],
+                     ['R11 D7 XE', 'Extended enable: palette port, S1, R8-R15 and IE1 become active. With XE = 0 the VDP is a TMS9918A.'],
+                     ['R11 D6 MX', 'Extended display modes (requires XE). Selects the modes of Table 2-3 together with M1, M2, M3.'],
+                     ['R11 D0 IE1', 'Scanline interrupt enable.'],
+                     ['R12 D7 T64', 'Extended text modes use 64 columns instead of 40.'],
+                     ['R12 D6 MASK', 'The leftmost 8 pixels show the backdrop colour, sprites included.'],
+                     ['R12 D5 VLOCK', 'Columns 24-31 do not scroll vertically.'],
+                     ['R12 D4 HLOCK', 'Lines 0-15 do not scroll horizontally.'],
                      ['R15 D4-D7', 'Status register returned by a status read: 1 selects S1, any other value selects S0.']],
                     [1.3 * inch, W - 1.3 * inch]),
               tcaption('TABLE 2-2 - EXTENDED REGISTER FUNCTIONS')]
@@ -265,13 +266,16 @@ def build_story(entries):
                 'limit applies to the sprites visible on either line of the pair; 5S and the sprite number in S0 report the ninth.')]
 
     story += [H(1, '2.7 Scrolling and Scanline Interrupt')]
-    story += [P('R9 and R10 scroll Graphics1X, Graphics2Fat, Bitmap and BitmapQ; R10 also scrolls the text modes. The memory '
-                'access sequence does not change: the fetched tile column is (c + 1 + R9/8) modulo 32 and the fine scroll selects '
+    story += [P('R8 and R9 scroll Graphics1X, Graphics2Fat, Bitmap and BitmapQ; R9 also scrolls the text modes. The memory '
+                'access sequence does not change: the fetched tile column is (c + 1 + R8/8) modulo 32 and the fine scroll selects '
                 'the output tap of the pixel shift register. MASK blanks the first 8 pixels so that 32 fetched columns cover the '
                 'visible picture for every fine scroll value. The world line selects name row, pattern row and third together.'),
-              P('The line counter is loaded from R12 at the first active line and whenever R12 is written. It is decremented at the end '
-                'of every active line 0-191; when it would become negative, FL is set and the counter is reloaded. R12 = 0 '
-                'interrupts on every line; R12 = n interrupts every n+1 lines.')]
+              P('Both scroll registers are sampled once per line, at the first background access of that line. A value written '
+                'later takes effect on the next line, on both axes: a cell can never take its name from one world position and '
+                'its pattern from another, and a scanline interrupt can change either register for the lines that follow.'),
+              P('The line counter is loaded from R10 at the first active line and whenever R10 is written. It is decremented at the end '
+                'of every active line 0-191; when it would become negative, FL is set and the counter is reloaded. R10 = 0 '
+                'interrupts on every line; R10 = n interrupts every n+1 lines.')]
     story += [PageBreak()]
 
     # ---------------------------------------------------------------- 3 interfaces
@@ -367,10 +371,10 @@ def build_story(entries):
           tcaption('TABLE 4-1 - VDP TO VRAM CONNECTIONS (AS TMS9918A, MP010A TABLE 3-1)'),
           H(1, '4.2 Software Detection'),
               P('Recommended detection sequence: (1) run F18A/PICO9918 detection first if supported; (2) write 5Ah twice to register '
-                '63 and restore R7; (3) write 01h to R8 (XE, bit D7; lands in R0 on other devices, restore R0); (4) write 01h to R15, read the '
-                'status port twice and compare the second value AND 3Eh with 18h; (5) write 00h to R15 and restore R7.'),
+                '63 and restore R7; (3) write 01h to R11 (XE, bit D7; lands in R3 on other devices, restore R3); (4) write 01h to R15, read the '
+                'status port twice and compare the second value AND 3Eh with 18h; (5) write 00h to R15 and restore R3 and R7.'),
               H(1, '4.3 Initialization'),
-              P('Extended modes are selected by writing XE and MX in R8, M1-M3 in R0/R1 and the table bases in R2, R4, R5 and R6, and by '
+              P('Extended modes are selected by writing XE and MX in R11, M1-M3 in R0/R1 and the table bases in R2, R4, R5 and R6, and by '
                 'loading the palette. Register values, memory maps and example programs for every mode are given in the TMS9918B '
                 'Programmer\'s Guide Supplement.')]
     story += [PageBreak()]

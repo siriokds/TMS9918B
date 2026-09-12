@@ -18,6 +18,7 @@ it verified against the data sheets of the RAMs and the timing of the original c
 | **Programmer's Guide Supplement** (TB-9918B-02) — unlocking, initialization, patterns, sprites, scrolling, Z80 examples | [Markdown](tms9918b_programmers_guide/TMS9918B_Programmers_Guide_Supplement.md) | [PDF](tms9918b_programmers_guide/TMS9918B_Programmers_Guide_Supplement.pdf) |
 | **Design Notes** (TB-9918B-03) — 1983 setting, memory constraints, precedents, rejected alternatives, cost | [Markdown](tms9918b_design_notes/TMS9918B_Design_Notes.md) | [PDF](tms9918b_design_notes/TMS9918B_Design_Notes.pdf) |
 | **Model** — unit-exact VRAM calendars, DRAM verification, CPU timing, tests | [README](tms9918b_model/README.md) | — |
+| **Tutorials** — 33 Z80 ROMs, one per mode and feature, built with sjasmplus | [README](tms9918b_tutorials/README.md) | — |
 
 The two manuals follow the structure and conventions of TI's own documents, the *TMS9918A/9928A/9929A Data
 Manual* (MP010A, 1982) and the *Video Display Processors Programmer's Guide* (SPPU004, 1984), including
@@ -54,6 +55,7 @@ bit 0 = MSB numbering.
 | Sprites per line | 4 | 8, with 3-colour sprite pairs and 512 patterns |
 | Scrolling | none | horizontal and vertical, left-column mask, locked areas |
 | Interrupts | frame | frame and scanline |
+| Scroll registers | — | R8 and R9, sampled once per line |
 | Worst CPU delay | 29 T-states (Graphics) | 14–18 T-states in extended modes |
 
 ## Why it is plausible
@@ -106,6 +108,7 @@ in 64 columns, 150 ns RAMs.
 │   ├── TMS9918B_Programmers_Guide_Supplement.pdf   (23 pages)
 │   ├── images_guide/                    memory maps (SVG)
 │   └── source/
+├── tms9918b_tutorials/                  33 lessons, shared includes, build.sh
 └── tms9918b_model/
     ├── src/                             calendars, cycle timing, addresses, modes, analysis
     │   └── tms99xx/                     TMS99xx slot grid, schedules, VRAM sequencer

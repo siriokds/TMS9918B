@@ -269,10 +269,10 @@ static void CheckModes()
     {
         const std::uint8_t r0 = (bits & 1) ? R0_M3 : 0;
         const std::uint8_t r1 = static_cast<std::uint8_t>(R1_BL | ((bits & 2) ? R1_M1 : 0) | ((bits & 4) ? R1_M2 : 0));
-        const std::uint8_t r8 = static_cast<std::uint8_t>(((bits & 8) ? R8_XE : 0) | ((bits & 16) ? R8_MX : 0));
-        const std::uint8_t r13 = (bits & 32) ? R13_T64 : 0;
+        const std::uint8_t r11 = static_cast<std::uint8_t>(((bits & 8) ? R11_XE : 0) | ((bits & 16) ? R11_MX : 0));
+        const std::uint8_t r12 = (bits & 32) ? R12_T64 : 0;
         const int m = ModeNumber(r0, r1);
-        const VideoMode mode = DecodeMode(r0, r1, r8, r13);
+        const VideoMode mode = DecodeMode(r0, r1, r11, r12);
         const ModeInfo info = Info(mode);
         ++combos;
         if (!(bits & 8) || !(bits & 16))
@@ -292,7 +292,7 @@ static void CheckModes()
             if ((m & 5) == 5)
                 CHECK(info.calendar == CalendarId::TmsText && info.spritesPerLine == 0, "extended bars %s", info.name);
             else if (m & 1)
-                CHECK((r13 ? info.calendar == CalendarId::Text64 : info.calendar == CalendarId::Text40) && info.spritesPerLine == 2,
+                CHECK((r12 ? info.calendar == CalendarId::Text64 : info.calendar == CalendarId::Text40) && info.spritesPerLine == 2,
                       "extended text %s", info.name);
             else
                 CHECK(info.spritesPerLine == 8 && info.linePairSpriteScan, "extended graphics %s", info.name);

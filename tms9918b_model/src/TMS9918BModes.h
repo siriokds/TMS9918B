@@ -9,7 +9,7 @@
  *
  * Bit weights (TI numbers bits with D0 = MSB):
  *   M1  = R1 10h (D3)   M2 = R1 08h (D4)   M3 = R0 02h (D6)
- *   XE  = R8 01h (D7)   MX = R8 02h (D6)   T64 = R13 01h (D7)
+ *   XE  = R11 01h (D7)   MX = R11 02h (D6)   T64 = R12 01h (D7)
  *   m   = M2 x 4 + M3 x 2 + M1, i.e. TMS99xx::m_iMode
  *
  * With XE = 0 or MX = 0 the mode is the TMS9918A one, including Text 1Q (m 3),
@@ -33,10 +33,10 @@ namespace TMS9918B
     constexpr std::uint8_t R1_BL  = 0x40;
     constexpr std::uint8_t R1_M1  = 0x10;
     constexpr std::uint8_t R1_M2  = 0x08;
-    constexpr std::uint8_t R8_XE  = 0x01;
-    constexpr std::uint8_t R8_MX  = 0x02;
-    constexpr std::uint8_t R8_IE1 = 0x80;
-    constexpr std::uint8_t R13_T64 = 0x01;
+    constexpr std::uint8_t R11_XE  = 0x01;
+    constexpr std::uint8_t R11_MX  = 0x02;
+    constexpr std::uint8_t R11_IE1 = 0x80;
+    constexpr std::uint8_t R12_T64 = 0x01;
 
     enum class VideoMode : std::uint8_t
     {
@@ -66,18 +66,18 @@ namespace TMS9918B
         return ((r1 & R1_M2) ? 4 : 0) | ((r0 & R0_M3) ? 2 : 0) | ((r1 & R1_M1) ? 1 : 0);
     }
 
-    constexpr bool ExtendedModesEnabled(std::uint8_t r8)
+    constexpr bool ExtendedModesEnabled(std::uint8_t r11)
     {
-        return (r8 & (R8_XE | R8_MX)) == (R8_XE | R8_MX);
+        return (r11 & (R11_XE | R11_MX)) == (R11_XE | R11_MX);
     }
 
-    constexpr VideoMode DecodeMode(std::uint8_t r0, std::uint8_t r1, std::uint8_t r8, std::uint8_t r13)
+    constexpr VideoMode DecodeMode(std::uint8_t r0, std::uint8_t r1, std::uint8_t r11, std::uint8_t r12)
     {
         const int m = ModeNumber(r0, r1);
-        if (!ExtendedModesEnabled(r8))
+        if (!ExtendedModesEnabled(r11))
             return static_cast<VideoMode>(m);
-        if (m == 1) return (r13 & R13_T64) ? VideoMode::Text64 : VideoMode::Text40X;
-        if (m == 3) return (r13 & R13_T64) ? VideoMode::Text64Q : VideoMode::Text40XQ;
+        if (m == 1) return (r12 & R12_T64) ? VideoMode::Text64 : VideoMode::Text40X;
+        if (m == 3) return (r12 & R12_T64) ? VideoMode::Text64Q : VideoMode::Text40XQ;
         return static_cast<VideoMode>(static_cast<int>(VideoMode::Graphics1X) + m);
     }
 
@@ -134,9 +134,9 @@ namespace TMS9918BModeChecks
 {
     using namespace TMS9918B;
     static_assert(DecodeMode(0x02, 0x10, 0x00, 0x00) == VideoMode::Text1Q);
-    static_assert(DecodeMode(0x02, 0x08, R8_XE, 0x00) == VideoMode::MulticolorQ);           // XE without MX
-    static_assert(DecodeMode(0x00, 0x18, R8_XE | R8_MX, R13_T64) == VideoMode::BarsX5);
-    static_assert(DecodeMode(0x02, 0x10, R8_XE | R8_MX, R13_T64) == VideoMode::Text64Q);
+    static_assert(DecodeMode(0x02, 0x08, R11_XE, 0x00) == VideoMode::MulticolorQ);           // XE without MX
+    static_assert(DecodeMode(0x00, 0x18, R11_XE | R11_MX, R12_T64) == VideoMode::BarsX5);
+    static_assert(DecodeMode(0x02, 0x10, R11_XE | R11_MX, R12_T64) == VideoMode::Text64Q);
     static_assert(Info(VideoMode::MulticolorQ).calendar == CalendarId::TmsMulticolor);
     static_assert(Info(VideoMode::Bars7).calendar == CalendarId::TmsText);
     static_assert(TmsAddressMode(VideoMode::BarsX7) == 7 && TmsAddressMode(VideoMode::Bitmap) == -1);

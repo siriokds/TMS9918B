@@ -139,13 +139,32 @@ INT is active (low) when F = 1 and IE = 1 (frame interrupt, as on the TMS9918A) 
 
 #### 2.1.5 VDP initialization
 
-RESET clears R0, R1, R8 and R13, locks the extended registers and selects status register S0. The palette and R9 to R15 are undefined after power-up and must be written before extended modes are used.
+RESET clears R0, R1, R11 and R12, locks the extended registers and selects status register S0. The palette and R8 to R15 are undefined after power-up and must be written before extended modes are used.
 
 ### 2.2 Write-Only Registers
 
-Registers R0 to R7 keep their TMS9918A functions (MP010A Section 2.2). Registers R8 to R15 exist after the unlock command. Figure 2-1 shows the extended registers; reserved bits must be written as 0.
+Registers R0 to R7 keep their TMS9918A functions (MP010A Section 2.2). Registers R11 to R15 exist after the unlock command. Figure 2-1 shows the extended registers; reserved bits must be written as 0.
 
-**R8 MODE** (D0 = MSB)
+**R8 H SCROLL** (D0 = MSB)
+
+| Bits | Field |
+|---|---|
+| D0-D4 | COLUMNS |
+| D5-D7 | FINE |
+
+**R9 V SCROLL** (D0 = MSB)
+
+| Bits | Field |
+|---|---|
+| D0-D7 | LINES (0-191) |
+
+**R10 LINE COUNT** (D0 = MSB)
+
+| Bits | Field |
+|---|---|
+| D0-D7 | RELOAD VALUE |
+
+**R11 MODE** (D0 = MSB)
 
 | Bits | Field |
 |---|---|
@@ -158,32 +177,7 @@ Registers R0 to R7 keep their TMS9918A functions (MP010A Section 2.2). Registers
 | D6 | MX |
 | D7 | XE |
 
-**R9 H SCROLL** (D0 = MSB)
-
-| Bits | Field |
-|---|---|
-| D0-D4 | COLUMNS |
-| D5-D7 | FINE |
-
-**R10 V SCROLL** (D0 = MSB)
-
-| Bits | Field |
-|---|---|
-| D0-D7 | LINES (0-191) |
-
-**R11** (D0 = MSB)
-
-| Bits | Field |
-|---|---|
-| D0-D7 | RESERVED |
-
-**R12 LINE COUNT** (D0 = MSB)
-
-| Bits | Field |
-|---|---|
-| D0-D7 | RELOAD VALUE |
-
-**R13 SCREEN** (D0 = MSB)
+**R12 SCREEN** (D0 = MSB)
 
 | Bits | Field |
 |---|---|
@@ -195,6 +189,18 @@ Registers R0 to R7 keep their TMS9918A functions (MP010A Section 2.2). Registers
 | D5 | VLOCK |
 | D6 | MASK |
 | D7 | T64 |
+
+**R13** (D0 = MSB)
+
+| Bits | Field |
+|---|---|
+| D0-D7 | RESERVED |
+
+**R14** (D0 = MSB)
+
+| Bits | Field |
+|---|---|
+| D0-D7 | RESERVED |
 
 **R14** (D0 = MSB)
 
@@ -216,16 +222,16 @@ Registers R0 to R7 keep their TMS9918A functions (MP010A Section 2.2). Registers
 
 | Register / bit | Function |
 |---|---|
-| R8 D7 XE | Extended enable: palette port, S1, R9-R15 and IE1 become active. With XE = 0 the VDP is a TMS9918A. |
-| R8 D6 MX | Extended display modes (requires XE). Selects the modes of Table 2-3 together with M1, M2, M3. |
-| R8 D0 IE1 | Scanline interrupt enable. |
-| R9 | World X = screen X + R9 (modulo 256). D0-D4 whole columns, D5-D7 pixels. |
-| R10 | World line = (line + R10) modulo 192. |
-| R12 | Scanline interrupt reload value (Section 2.7). |
-| R13 D7 T64 | Extended text modes use 64 columns instead of 40. |
-| R13 D6 MASK | The leftmost 8 pixels show the backdrop colour, sprites included. |
-| R13 D5 VLOCK | Columns 24-31 do not scroll vertically. |
-| R13 D4 HLOCK | Lines 0-15 do not scroll horizontally. |
+| R8 | World X = screen X + R8 (modulo 256). D0-D4 whole columns, D5-D7 pixels. Sampled once per line. |
+| R9 | World line = (line + R9) modulo 192. Sampled once per line. |
+| R10 | Scanline interrupt reload value (Section 2.7). |
+| R11 D7 XE | Extended enable: palette port, S1, R8-R15 and IE1 become active. With XE = 0 the VDP is a TMS9918A. |
+| R11 D6 MX | Extended display modes (requires XE). Selects the modes of Table 2-3 together with M1, M2, M3. |
+| R11 D0 IE1 | Scanline interrupt enable. |
+| R12 D7 T64 | Extended text modes use 64 columns instead of 40. |
+| R12 D6 MASK | The leftmost 8 pixels show the backdrop colour, sprites included. |
+| R12 D5 VLOCK | Columns 24-31 do not scroll vertically. |
+| R12 D4 HLOCK | Lines 0-15 do not scroll horizontally. |
 | R15 D4-D7 | Status register returned by a status read: 1 selects S1, any other value selects S0. |
 
 **TABLE 2-2 - EXTENDED REGISTER FUNCTIONS**
@@ -367,9 +373,11 @@ Sprite selection is evaluated over line pairs: the vertical positions of sprites
 
 ### 2.7 Scrolling and Scanline Interrupt
 
-R9 and R10 scroll Graphics1X, Graphics2Fat, Bitmap and BitmapQ; R10 also scrolls the text modes. The memory access sequence does not change: the fetched tile column is (c + 1 + R9/8) modulo 32 and the fine scroll selects the output tap of the pixel shift register. MASK blanks the first 8 pixels so that 32 fetched columns cover the visible picture for every fine scroll value. The world line selects name row, pattern row and third together.
+R8 and R9 scroll Graphics1X, Graphics2Fat, Bitmap and BitmapQ; R9 also scrolls the text modes. The memory access sequence does not change: the fetched tile column is (c + 1 + R8/8) modulo 32 and the fine scroll selects the output tap of the pixel shift register. MASK blanks the first 8 pixels so that 32 fetched columns cover the visible picture for every fine scroll value. The world line selects name row, pattern row and third together.
 
-The line counter is loaded from R12 at the first active line and whenever R12 is written. It is decremented at the end of every active line 0-191; when it would become negative, FL is set and the counter is reloaded. R12 = 0 interrupts on every line; R12 = n interrupts every n+1 lines.
+Both scroll registers are sampled once per line, at the first background access of that line. A value written later takes effect on the next line, on both axes: a cell can never take its name from one world position and its pattern from another, and a scanline interrupt can change either register for the lines that follow.
+
+The line counter is loaded from R10 at the first active line and whenever R10 is written. It is decremented at the end of every active line 0-191; when it would become negative, FL is set and the counter is reloaded. R10 = 0 interrupts on every line; R10 = n interrupts every n+1 lines.
 
 ## 3. VDP INTERFACES AND OPERATION
 
@@ -482,11 +490,11 @@ The TMS9918B replaces the TMS9918A or TMS9929A of an SC-3000 class system withou
 
 ### 4.2 Software Detection
 
-Recommended detection sequence: (1) run F18A/PICO9918 detection first if supported; (2) write 5Ah twice to register 63 and restore R7; (3) write 01h to R8 (XE, bit D7; lands in R0 on other devices, restore R0); (4) write 01h to R15, read the status port twice and compare the second value AND 3Eh with 18h; (5) write 00h to R15 and restore R7.
+Recommended detection sequence: (1) run F18A/PICO9918 detection first if supported; (2) write 5Ah twice to register 63 and restore R7; (3) write 01h to R11 (XE, bit D7; lands in R3 on other devices, restore R3); (4) write 01h to R15, read the status port twice and compare the second value AND 3Eh with 18h; (5) write 00h to R15 and restore R3 and R7.
 
 ### 4.3 Initialization
 
-Extended modes are selected by writing XE and MX in R8, M1-M3 in R0/R1 and the table bases in R2, R4, R5 and R6, and by loading the palette. Register values, memory maps and example programs for every mode are given in the TMS9918B Programmer's Guide Supplement.
+Extended modes are selected by writing XE and MX in R11, M1-M3 in R0/R1 and the table bases in R2, R4, R5 and R6, and by loading the palette. Register values, memory maps and example programs for every mode are given in the TMS9918B Programmer's Guide Supplement.
 
 ## 5. TMS9918B/9928B/9929B ELECTRICAL SPECIFICATIONS
 

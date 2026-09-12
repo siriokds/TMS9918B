@@ -158,15 +158,15 @@ def build_story(entries):
                 'TMS9118, V9938 or F18A: every write that could land in another register is undone. Run it with interrupts '
                 'disabled, because it reads the status register.')]
     story += B(['Unlock (Section 3.1) and restore R7.',
-                'Write 01h to R8 (XE). On other devices this lands in R0: restore R0.',
+                'Write 01h to R11 (XE). On other devices this lands in R3: restore R3.',
                 'Write 01h to R15 to select S1. On other devices this lands in R7.',
                 'Read the status port twice. On a TMS9918B the second value AND 3Eh equals 18h.',
-                'Write 00h to R15 to select S0 again, then restore R0 and R7.'])
+                'Write 00h to R15 to select S0 again, then restore R3 and R7.'])
     story += example('EXAMPLE 3-1. Detecting the TMS9918B', code('''
 DETECT: DI
         CALL UNLOCK        ; two writes of 5AH to register 63
         LD   A,01H         ; XE
-        LD   B,8
+        LD   B,11
         CALL WRREG
         LD   A,01H         ; select S1
         LD   B,15
@@ -178,8 +178,8 @@ DETECT: DI
         XOR  A             ; select S0
         LD   B,15
         CALL WRREG
-        LD   A,(SHADOW0)   ; restore R0 and R7
-        LD   B,0
+        LD   A,(SHADOW3)   ; restore R3 and R7
+        LD   B,3
         CALL WRREG
         LD   A,(SHADOW7)
         LD   B,7
@@ -225,17 +225,19 @@ PALETTE:                   ; palette 0: -, white, grey, dark blue
     story += [SectionMarker('4'), H(0, '4. DESCRIPTION OF THE EXTENDED REGISTERS'), H(1, '4.1 Extended Write-Only Registers')]
     story += [P('Unused bits must be written as 0 to remain compatible with future devices.')]
     reg_desc = [
-        ('4.1.1 Register 8 (Mode)', 'R8', [('IE1', 1), ('0', 1), ('0', 1), ('0', 1), ('0', 1), ('0', 1), ('MX', 1), ('XE', 1)],
+        ('4.1.1 Register 8 (Horizontal Scroll)', 'R8', [('COLUMNS', 5), ('PIXELS', 3)],
+         ['The picture moves left as R8 increases: world X = screen X + R8. Bits 0-4 scroll by whole 8-pixel columns, bits 5-7 by pixels.',
+          'R8 is sampled once per line, at the first background access of that line: a value written later takes effect on the next line (Section 9.4).']),
+        ('4.1.2 Register 9 (Vertical Scroll)', 'R9', [('LINES', 8)],
+         ['The picture moves up as R9 increases: world line = (screen line + R9) modulo 192. Values 192-255 are not useful.',
+          'R9 is sampled once per line like R8, so a scanline interrupt can change either axis for the lines that follow.']),
+        ('4.1.3 Register 10 (Line Count)', 'R10', [('RELOAD VALUE', 8)],
+         ['Number of displayed lines between scanline interrupts minus 1 (Section 10).']),
+        ('4.1.4 Register 11 (Mode)', 'R11', [('IE1', 1), ('0', 1), ('0', 1), ('0', 1), ('0', 1), ('0', 1), ('MX', 1), ('XE', 1)],
          ['Bit 0 = IE1 (scanline interrupt enable). 0 disables, 1 enables the scanline interrupt.',
           'Bit 6 = MX (extended modes). With XE = 1, selects the extended display modes (Section 5).',
-          'Bit 7 = XE (extended enable). 1 activates the palette, S1, R9-R15 and IE1. With XE = 0 the VDP behaves as a TMS9918A.']),
-        ('4.1.2 Register 9 (Horizontal Scroll)', 'R9', [('COLUMNS', 5), ('PIXELS', 3)],
-         ['The picture moves left as R9 increases: world X = screen X + R9. Bits 0-4 scroll by whole 8-pixel columns, bits 5-7 by pixels.']),
-        ('4.1.3 Register 10 (Vertical Scroll)', 'R10', [('LINES', 8)],
-         ['The picture moves up as R10 increases: world line = (screen line + R10) modulo 192. Values 192-255 are not useful.']),
-        ('4.1.4 Register 12 (Line Count)', 'R12', [('RELOAD VALUE', 8)],
-         ['Number of lines between scanline interrupts minus 1 (Section 9.2).']),
-        ('4.1.5 Register 13 (Screen)', 'R13', [('0', 1), ('0', 1), ('0', 1), ('0', 1), ('HLOCK', 1), ('VLOCK', 1), ('MASK', 1), ('T64', 1)],
+          'Bit 7 = XE (extended enable). 1 activates the palette, S1, R8-R15 and IE1. With XE = 0 the VDP behaves as a TMS9918A.']),
+        ('4.1.5 Register 12 (Screen)', 'R12', [('0', 1), ('0', 1), ('0', 1), ('0', 1), ('HLOCK', 1), ('VLOCK', 1), ('MASK', 1), ('T64', 1)],
          ['Bit 4 = HLOCK. 1: lines 0-15 are not scrolled horizontally (status bar).',
           'Bit 5 = VLOCK. 1: columns 24-31 are not scrolled vertically (side panel).',
           'Bit 6 = MASK. 1: the leftmost 8 pixels show the backdrop; use it with horizontal pixel scrolling.',
@@ -255,8 +257,8 @@ PALETTE:                   ; palette 0: -, white, grey, dark blue
     # ------------------------------------------------------------ 5
     story += [SectionMarker('5'), H(0, '5. INITIALIZING THE EXTENDED MODES')]
     story += [P('An extended mode is initialized like a TMS9918A mode (SPPU004 Section 6) plus four steps: unlock, set XE and MX in '
-                'R8, set R13, and load the palette. The typical values below fit every table in 16K of VRAM; the resulting '
-                'memory maps follow each table. Scroll registers R9 and R10 should be written as 00h.'),
+                'R11, set R12, and load the palette. The typical values below fit every table in 16K of VRAM; the resulting '
+                'memory maps follow each table. Scroll registers R8 and R9 should be written as 00h.'),
               P('The two-byte and four-byte entries of the extended tables are always fetched together. Tables must start at the '
                 'addresses given by the registers; do not offset them by one byte.')]
 
@@ -270,8 +272,8 @@ PALETTE:                   ; palette 0: -, white, grey, dark blue
             ('REG 5', 0x7C, 'Sprite attribute table = 3E00h'),
             ('REG 6', 0x05, 'Sprite pattern table = 2800h; BANK table = 3000h'),
             ('REG 7', 0x01, 'Backdrop colour = black'),
-            ('REG 8', 0x03, 'Extended enable, extended modes'),
-            ('REG 13', 0x02, 'MASK on (for horizontal scrolling)')],
+            ('REG 11', 0x03, 'Extended enable, extended modes'),
+            ('REG 12', 0x02, 'MASK on (for horizontal scrolling)')],
          [(0x0000, 0x2000, 'PATTERN TABLE'), (0x2000, 0x2800, 'UNUSED'), (0x2800, 0x3000, 'SPRITE PATTERNS'),
           (0x3000, 0x3800, 'SPRITE PATTERNS (BANK)'), (0x3800, 0x3E00, 'NAME/ATTRIBUTE TABLE'), (0x3E00, 0x3E80, 'SPRITE ATTRIBUTES'),
           (0x3E80, 0x4000, 'UNUSED')]),
@@ -284,8 +286,8 @@ PALETTE:                   ; palette 0: -, white, grey, dark blue
             ('REG 5', 0x7C, 'Sprite attribute table = 3E00h'),
             ('REG 6', 0x06, 'Sprite pattern table = 3000h (no room for BANK)'),
             ('REG 7', 0x01, 'Backdrop colour = black'),
-            ('REG 8', 0x03, 'Extended enable, extended modes'),
-            ('REG 13', 0x00, 'No mask, no locks')],
+            ('REG 11', 0x03, 'Extended enable, extended modes'),
+            ('REG 12', 0x00, 'No mask, no locks')],
          [(0x0000, 0x3000, 'PATTERN TABLE (3 x 4096)'), (0x3000, 0x3800, 'SPRITE PATTERNS'), (0x3800, 0x3E00, 'NAME/ATTRIBUTE TABLE'),
           (0x3E00, 0x3E80, 'SPRITE ATTRIBUTES'), (0x3E80, 0x4000, 'UNUSED')]),
         ('5.3 Bitmap Mode Initialization', 'BITMAP', [
@@ -297,8 +299,8 @@ PALETTE:                   ; palette 0: -, white, grey, dark blue
             ('REG 5', 0x76, 'Sprite attribute table = 3B00h'),
             ('REG 6', 0x06, 'Sprite pattern table = 3000h'),
             ('REG 7', 0x01, 'Backdrop colour = black'),
-            ('REG 8', 0x03, 'Extended enable, extended modes'),
-            ('REG 13', 0x00, 'No mask, no locks')],
+            ('REG 11', 0x03, 'Extended enable, extended modes'),
+            ('REG 12', 0x00, 'No mask, no locks')],
          [(0x0000, 0x3000, 'BITMAP'), (0x3000, 0x3800, 'SPRITE PATTERNS'), (0x3800, 0x3B00, 'PALETTE MAP'),
           (0x3B00, 0x3B80, 'SPRITE ATTRIBUTES'), (0x3B80, 0x4000, 'UNUSED')]),
         ('5.4 Text40X and Text64 Mode Initialization', 'TEXT', [
@@ -310,8 +312,8 @@ PALETTE:                   ; palette 0: -, white, grey, dark blue
             ('REG 5', 0x76, 'Sprite attribute table = 3B00h (cursor sprites 0 and 1)'),
             ('REG 6', 0x01, 'Cursor pattern table = 0800h'),
             ('REG 7', 0xF4, 'White characters on dark blue'),
-            ('REG 8', 0x03, 'Extended enable, extended modes'),
-            ('REG 13', 0x01, 'T64 = 1 for 64 columns; 00h for Text40X')],
+            ('REG 11', 0x03, 'Extended enable, extended modes'),
+            ('REG 12', 0x01, 'T64 = 1 for 64 columns; 00h for Text40X')],
          [(0x0000, 0x0800, 'PATTERN TABLE'), (0x0800, 0x0900, 'CURSOR PATTERNS'), (0x0900, 0x3000, 'UNUSED'),
           (0x3000, 0x3780, 'CHARACTER TABLE'), (0x3780, 0x3B00, 'UNUSED'), (0x3B00, 0x3B08, 'CURSOR ATTRIBUTES'),
           (0x3B08, 0x4000, 'UNUSED')]),
@@ -342,7 +344,7 @@ INIT1:  LD   A,(HL)        ; value
 
 G1XREGS:
         DB   00H,0, 0C2H,1, 0EH,2, 00H,4, 7CH,5
-        DB   05H,6, 01H,7, 03H,8, 02H,13, 00H,9
+        DB   05H,6, 01H,7, 03H,11, 02H,12, 00H,8
 '''))
     story += [PageBreak()]
 
@@ -485,65 +487,188 @@ BLINK:  LD   HL,BLINKCNT
     story += [PageBreak()]
 
     # ------------------------------------------------------------ 9
-    story += [SectionMarker('9'), H(0, '9. PROGRAMMING TIPS')]
-    story += [H(1, '9.1 Hardware Scrolling'),
-              P('SPPU004 Section 10.1 scrolls by moving the Name Table, eight pixels at a time. The TMS9918B scrolls by pixels '
-                'with R9 and R10 and needs no VRAM writes. Horizontal pixel scrolling shows a partial column at the left edge: set '
-                'MASK in R13 to hide it. HLOCK keeps a 16-line status bar still while the playfield scrolls; VLOCK does the same '
-                'for an 8-column side panel.'),
-              P('To scroll further than the 256 x 192 picture, update one column (or row) of the name table each time R9 (or '
-                'R10) crosses a multiple of 8, in the column that is about to enter the screen.')]
-    story += example('EXAMPLE 9-1. Smooth horizontal scroll with a fixed status bar', code('''
-; once:  R13 = 0AH (HLOCK + MASK)
-SCROLL: LD   A,(SCROLLX)   ; call once per frame
-        INC  A
-        LD   (SCROLLX),A
-        LD   B,9
-        JP   WRREG
-'''))
-    story += [H(1, '9.2 Scanline Interrupts'),
-              P('The line counter is loaded with R12 at the first line of the picture and whenever R12 is written; it counts '
-                'the displayed lines and sets FL after R12 + 1 lines, then starts again. With R12 = 95 interrupts occur at the '
-                'end of lines 95 and 191. Enable them with IE1 in R8; the INT line is shared with the frame interrupt, so the '
-                'handler reads S1 to find out which one occurred.')]
-    story += example('EXAMPLE 9-2. Changing a palette entry at line 96', code('''
-IRQ:    PUSH AF            ; IM 1 handler at 0038H
+    story += [SectionMarker('9'), H(0, '9. SCROLLING')]
+    story += [P('SPPU004 Section 10.1 scrolls a TMS9918A screen by rewriting the Name Table, eight pixels at a time and 768 bytes '
+                'per step. The TMS9918B scrolls by single pixels with two registers and no VRAM write at all. This section '
+                'explains what the two registers do, what the three bits of R12 are for, when a written value becomes visible, '
+                'and how to keep scrolling past the edge of the 32x24 world.')]
+    story += [H(1, '9.1 The World and the Screen'),
+              P('Think of the Name Table as a world of 32 by 24 cells that wraps in both directions, and of the screen as a '
+                'window on it. The two registers move the window:'),
+              table([['Register', 'Effect', 'Wrap'],
+                     ['R8, horizontal', 'world X = screen X + R8. Bits 0-4 are whole 8-pixel columns, bits 5-7 are pixels.', 'every 256 pixels, that is 32 columns'],
+                     ['R9, vertical', 'world line = (screen line + R9) modulo 192.', 'every 192 lines, that is 24 rows']],
+                    [1.25 * inch, W - 3.35 * inch, 2.1 * inch]),
+              tcaption('TABLE 9-1 - THE SCROLL REGISTERS'),
+              P('Increasing a register moves the picture left or up, which is the same as moving the window right or down. '
+                'Both are unsigned: to scroll the other way, decrement. The registers never change what is stored in VRAM, so '
+                'a screen can scroll for as long as the program wants while the CPU does something else.'),
+              P('Scrolling applies to Graphics1X, Graphics2Fat, Bitmap and BitmapQ. The extended text modes accept R9 only: '
+                'the character cell is six or eight pixels wide and the columns are fetched in a fixed order, so there is no '
+                'horizontal scrolling at 40 or 64 columns.')]
+    story += [H(1, '9.2 What the VDP Does With Them'),
+              P('The memory access sequence never changes: the 32 cells of a line are fetched in the same cycles whatever the '
+                'scroll value is. Only two things change.'),
+              P('<b>The address.</b> Active cell c fetches world column (c + 1 + R8 / 8) AND 31, and every address of the line - '
+                'name, attribute, pattern row and, with M3, the third - is computed from the world line, so banked content '
+                'scrolls as a whole.'),
+              P('<b>The output tap.</b> The pixels of a cell go through a shift register; the low three bits of R8 select which '
+                'pixel of it appears first. That is what makes the movement smooth instead of jumping by eight pixels.'),
+              P('Because the fetch starts one column early, a partial column always appears in the leftmost eight pixels when '
+                'R8 is not a multiple of eight. Section 9.3 is about hiding it.')]
+    story += [H(1, '9.3 MASK, HLOCK and VLOCK'),
+              table([['Bit', 'Weight', 'Effect', 'Used for'],
+                     ['MASK', '02h', 'The leftmost eight pixels always show the backdrop of R7, sprites included.', 'hiding the partial column; set it whenever R8 is used'],
+                     ['HLOCK', '08h', 'Lines 0-15, that is character rows 0 and 1, ignore R8.', 'a score bar that stays still while the playfield scrolls'],
+                     ['VLOCK', '04h', 'Columns 24-31 ignore R9.', 'a side panel that stays still while the playfield scrolls'],
+                     ['T64', '01h', 'Not a scrolling bit: 64-column text.', '-']],
+                    [0.75 * inch, 0.6 * inch, W - 3.85 * inch, 2.5 * inch], align_center_cols=(1,)),
+              tcaption('TABLE 9-2 - REGISTER 12'),
+              note('A locked area ignores one axis, not both: with HLOCK the status bar still moves vertically, and with VLOCK '
+                   'the side panel still moves horizontally. A panel that must never move needs both bits, or a screen that '
+                   'scrolls on one axis only.')]
+    story += [H(1, '9.4 When a Written Value Becomes Visible'),
+              P('Both registers are sampled once per line, at the start of the horizontal blanking that precedes the line, '
+                'together with the sprites of that line. A value written after that moment takes effect on the next line.'),
+              P('This is a guarantee, not a limitation. It means that a cell can never take its name from one world position and '
+                'its pattern from another, whatever the CPU does; that the same program produces the same picture on every '
+                'implementation; and that a scanline interrupt can change either axis for the lines that follow, which is what '
+                'Section 10 is about. The TMS9918B has no mid-line effects at all: the smallest unit that can change is one '
+                'line.'),
+              note('The Sega VDP of 1985 latches the vertical scroll once per frame and ignores writes until the next one, so '
+                   'raster effects there can change the horizontal axis only. The TMS9918B samples both axes per line, which is '
+                   'why the split screens of Section 10.4 can move vertically as well.')]
+    story += [H(1, '9.5 Scrolling Beyond One Screen'),
+              P('The world is only 32 by 24 cells, so after 256 pixels the picture repeats. To scroll indefinitely, rewrite the '
+                'column - or the row - that is about to enter the screen, one every eight pixels of movement. The column to '
+                'rewrite is the one the window is leaving, because the world wraps:'),
+              code('''
+; Called once per frame. Scrolls right by one pixel and refills a column
+; every eight pixels. WORLD_X is the 16-bit position in the world.
+SCROLL_STEP:
+        ld hl,(WORLD_X)
+        inc hl
+        ld (WORLD_X),hl
+        ld a,l
+        ld b,8                  ; R8 = low byte of the world position
+        call WRREG
+        and 7
+        ret nz                  ; only every eight pixels
+        ld a,l
+        rrca
+        rrca
+        rrca
+        and 31                  ; column entering on the right
+        add a,31
+        and 31                  ; the column leaving on the left holds it
+        jp REFILL_COLUMN        ; writes 24 entries of two bytes
+'''),
+              P('Twenty-four two-byte entries are 48 bytes: at 21 T-states each in a tile mode this is about 1000 T-states, '
+                'well inside a frame. The same method applies to R9 with rows instead of columns.')]
+    story += [H(1, '9.6 Sprites Are Not Scrolled'),
+              P('The scroll registers move the playfield only. A sprite is placed in screen coordinates, so a program keeps its '
+                'objects in world coordinates and subtracts the scroll position when it writes the Sprite Attribute Table:'),
+              code('''
+; DE = world X of the object, HL = world Y. Produces the SAT bytes.
+        ld a,e
+        ld hl,(WORLD_X)
+        sub l                   ; screen X = world X - scroll X
+        ld (SAT_X),a
+'''),
+              P('This is the same arrangement every scrolling machine of the period used, and the reason the hardware cursor of '
+                'the text modes is not affected by R9 either.')]
+    story += [PageBreak()]
+
+    # ------------------------------------------------------------ 10
+    story += [SectionMarker('10'), H(0, '10. THE SCANLINE INTERRUPT')]
+    story += [P('The frame interrupt of the TMS9918A tells a program that the picture is finished. The scanline interrupt tells '
+                'it that a chosen line is finished, while the picture is still being drawn: that is what turns one playfield '
+                'into several bands with different scroll positions, palettes or backdrops.')]
+    story += [H(1, '10.1 The Line Counter'),
+              P('R10 holds a reload value. The counter is loaded from R10 at the first line of the picture and whenever R10 is '
+                'written; it is decremented at the end of every displayed line, and when it would go below zero the flag FL is '
+                'set and the counter is reloaded.'),
+              table([['R10', 'Interrupt at the end of lines'],
+                     ['0', 'every line: 0, 1, 2, ... 191'],
+                     ['7', 'every eight lines: 7, 15, 23, ... 191'],
+                     ['47', '47, 95, 143, 191: the screen in four equal bands'],
+                     ['95', '95 and 191: two halves'],
+                     ['192 or more', 'never, because only lines 0-191 are counted']],
+                    [0.9 * inch, W - 0.9 * inch], align_center_cols=(0,)),
+              tcaption('TABLE 10-1 - TYPICAL LINE COUNTS'),
+              note('Writing R10 reloads the counter at once, so a handler can change the distance to the next interrupt: the '
+                   'bands of a screen do not have to be equally spaced.')]
+    story += [H(1, '10.2 Enabling and Acknowledging'),
+              P('IE1 in R11 connects the flag to the INT pin, which is shared with the frame interrupt of R1. A handler must '
+                'therefore find out which of the two occurred, and clear both flags before returning:'),
+              table([['Step', 'Why'],
+                     ['Write 01h to R15', 'select S1'],
+                     ['Read the status port', 'S1: bit 7 (weight 01h) is FL; the read clears it'],
+                     ['Write 00h to R15', 'select S0 again, at once'],
+                     ['Read the status port', 'S0: bit 0 (weight 80h) is the frame flag; the read clears it'],
+                     ['Act on the flags', 'FL: paint the next band. Frame flag: start the frame again.']],
+                    [1.9 * inch, W - 1.9 * inch]),
+              tcaption('TABLE 10-2 - ACKNOWLEDGING BOTH INTERRUPTS'),
+              P('Leaving R15 at 00h outside the handler is a convention, not a rule of the device: it keeps the status port '
+                'showing S0 for any code that expects the TMS9918A.')]
+    story += [H(1, '10.3 What a Handler Can Change in Time'),
+              P('The interrupt is raised at the end of line N. The registers of line N+1 are sampled during the horizontal '
+                'blanking that has just begun, so a short handler that writes R8, R9, R7 or a palette entry immediately is in '
+                'time for the very next line; a longer one takes effect one or two lines later. A band boundary is therefore '
+                'stable to within a line or two, which is why bands are usually placed where a line of colour separates them.'),
+              P('The safest arrangement is to prepare everything before the interrupt and to write only registers inside it: no '
+                'VRAM addressing, no long loops, no two-byte control transfers that another interrupt could break.')]
+    story += [H(1, '10.4 Four Things a Band Can Do'),
+              table([['Effect', 'What the handler writes', 'Result'],
+                     ['Parallax', 'R8 with a different value per band', 'a sky that moves slower than the ground'],
+                     ['Fixed status bar', 'R8 = 0 for the first band, the scroll value for the rest', 'the same as HLOCK, but with the boundary where the program wants it'],
+                     ['Vertical split', 'R9 with a different value per band', 'two halves of the world on one screen'],
+                     ['Colour change', 'R7 or a palette entry', 'a coloured sky, a different backdrop per band, more than 16 colours on screen']],
+                    [1.3 * inch, 2.1 * inch, W - 3.4 * inch]),
+              tcaption('TABLE 10-3 - USES OF THE SCANLINE INTERRUPT')]
+    story += example('EXAMPLE 10-1. Two bands with different horizontal speeds', code('''
+; R10 = 95: the interrupt fires at the end of lines 95 and 191.
+; BAND holds which band the handler is about to prepare.
+IRQ:    PUSH AF
         PUSH BC
         LD   A,01H
         LD   B,15
-        CALL WRREG         ; select S1
-        IN   A,(VDPCTL)    ; read S1, clears FL
+        CALL WRREG              ; select S1
+        IN   A,(VDPCTL)         ; read S1: bit 7 is FL
         LD   C,A
         XOR  A
         LD   B,15
-        CALL WRREG         ; select S0
-        BIT  0,C           ; FL (weight 01H)
+        CALL WRREG              ; back to S0
+        IN   A,(VDPCTL)         ; read S0: clears the frame flag
+        BIT  0,C                ; weight 01H
         JR   Z,FRAME
-        LD   A,(LINECNT)   ; 0 = line 95, 1 = line 191
-        XOR  1
-        LD   (LINECNT),A
-        JR   Z,FRAME
-        LD   A,01H         ; lower half: palette 0 entry 1 = dark red
-        OUT  (VDPCTL),A
-        LD   A,0C0H
-        OUT  (VDPCTL),A
-        LD   A,06H
-        OUT  (VDPDAT),A
-FRAME:  IN   A,(VDPCTL)    ; read S0, clears the frame flag
-        ; ... frame work: restore entry 1, move sprites
-        POP  BC
+        LD   A,(SCROLL_FAR)     ; lower band: the ground
+        LD   B,8
+        CALL WRREG
+        JR   DONE
+FRAME:  LD   A,(SCROLL_NEAR)    ; upper band: the sky
+        LD   B,8
+        CALL WRREG
+        LD   HL,SCROLL_NEAR     ; move both layers for the next frame
+        INC  (HL)
+        LD   HL,SCROLL_FAR
+        INC  (HL)
+        INC  (HL)
+DONE:   POP  BC
         POP  AF
         EI
         RETI
 '''))
-    story += [note('A program that is interrupted in the middle of a two-byte control transfer loses the first byte when the '
-                   'handler writes a register. Disable interrupts around VRAM address and register writes in the main program.')]
-    story += [H(1, '9.3 Palette Effects'),
+    story += [PageBreak()]
+
+    # ------------------------------------------------------------ 11
+    story += [SectionMarker('11'), H(0, '11. OTHER PROGRAMMING TIPS')]
+    story += [H(1, '11.1 Palette Effects'),
               P('Palette writes never wait for a memory access window, so they can be done at any time. Fading in and out is '
                 'done by stepping the luminance value of every entry from 30h to 00h and back, one step every few frames. Colour '
                 'cycling is done by rewriting the three entries of a palette in rotation: animated water, conveyor belts and '
                 'flashing lights need no pattern or name changes.')]
-    story += [H(1, '9.4 Loading VRAM Quickly'),
+    story += [H(1, '11.2 Loading VRAM Quickly'),
               P('The CPU can transfer data to VRAM without losing bytes when each transfer takes at least the total time of '
                 'Appendix B for the mode. The fastest safe loops are:'),
               table([['Mode', 'Fastest safe loop', 'T-states per byte'],
@@ -553,37 +678,50 @@ FRAME:  IN   A,(VDPCTL)    ; read S0, clears the frame flag
                      ['Text40X, Text64', 'OUTI chain', '16'],
                      ['Any mode, vertical blanking or display blanked', 'OUTI chain', '16']],
                     [2.3 * inch, 2.5 * inch, W - 4.8 * inch], align_center_cols=(2,)),
-              tcaption('TABLE 9-1 - FAST VRAM TRANSFERS')]
+              tcaption('TABLE 11-1 - FAST VRAM TRANSFERS')]
     story += [PageBreak()]
 
-    # ------------------------------------------------------------ Appendices
-    story += [SectionMarker('A'), H(0, 'APPENDIX A - EXTENDED REGISTER QUICK REFERENCE')]
-    story += [table([['Register', 'Bit (weight)', 'Name', 'Function'],
-                     ['R8', '0 (80h)', 'IE1', 'Scanline interrupt enable'],
-                     ['R8', '6 (02h)', 'MX', 'Extended display modes'],
-                     ['R8', '7 (01h)', 'XE', 'Extended enable'],
-                     ['R9', '0-4 (F8h)', 'COLUMNS', 'Horizontal scroll, 8-pixel steps'],
-                     ['R9', '5-7 (07h)', 'PIXELS', 'Horizontal scroll, pixels'],
-                     ['R10', '0-7', 'LINES', 'Vertical scroll, 0-191'],
-                     ['R12', '0-7', 'RELOAD', 'Lines between scanline interrupts minus 1'],
-                     ['R13', '4 (08h)', 'HLOCK', 'Lines 0-15 not scrolled horizontally'],
-                     ['R13', '5 (04h)', 'VLOCK', 'Columns 24-31 not scrolled vertically'],
-                     ['R13', '6 (02h)', 'MASK', 'Blank the leftmost 8 pixels'],
-                     ['R13', '7 (01h)', 'T64', '64-column text'],
-                     ['R15', '4-7 (0Fh)', 'SELECT', '01h = S1, other = S0'],
-                     ['S1', '7 (01h)', 'FL', 'Scanline interrupt flag; bits 0-6 = 18h'],
-                     ['Attribute', '4 (08h)', 'NAME8', 'Ninth name bit (Graphics1X)'],
-                     ['Attribute', '5 (04h)', 'PRIOR', 'Tile in front of sprites'],
-                     ['Attribute', '6-7 (03h)', 'PALETTE', 'Tile palette (Graphics1X), area palette (palette map)'],
-                     ['Sprite byte 3', '0 (80h)', 'EC', 'Early clock'],
-                     ['Sprite byte 3', '2 (20h)', 'BANK', 'Second sprite pattern table'],
-                     ['Sprite byte 3', '3 (10h)', 'PAIR', 'Second bit plane of sprite 2k (odd sprites)'],
-                     ['Sprite byte 3', '4-5 (0Ch)', 'PALETTE', 'Sprite palette'],
-                     ['Sprite byte 3', '6-7 (03h)', 'ENTRY', 'Sprite colour entry, 0 = invisible'],
-                     ['Palette entry', '2-3 (30h)', 'LUMINANCE', '00h full, 10h 3/4, 20h 1/2, 30h 1/4'],
-                     ['Palette entry', '4-7 (0Fh)', 'COLOUR', 'TMS9918A colour number']],
-                    [1.1 * inch, 0.95 * inch, 0.9 * inch, W - 2.95 * inch], align_center_cols=(1,)),
-              tcaption('TABLE A-1 - EXTENDED REGISTERS AND FIELDS')]
+    story += [SectionMarker('A'), H(0, 'APPENDIX A - REGISTER MAP')]
+    story += [P('Every write-only register and every status register of the TMS9918B. Registers 0 to 7 keep their TMS9918A '
+                'meaning; registers 8 to 15 exist after the unlock command of Section 3.1. Bit 0 is the MSB, and the weight '
+                'column gives the value to OR into the register.')]
+    story += [table([['Register', 'Name', 'Bits', 'Weight', 'Function'],
+                     ['R0', 'Mode 1', 'D6 M3', '02h', 'Mode bit 3; with MX selects the Q variants'],
+                     ['', '', 'D7 EXTVID', '01h', 'External VDP plane'],
+                     ['R1', 'Mode 2', 'D0 4/16K', '80h', 'Must be 1: the extended modes need 16K'],
+                     ['', '', 'D1 BL', '40h', 'Display enable'],
+                     ['', '', 'D2 IE', '20h', 'Frame interrupt enable'],
+                     ['', '', 'D3 M1, D4 M2', '10h, 08h', 'Mode bits 1 and 2'],
+                     ['', '', 'D6 SIZE, D7 MAG', '02h, 01h', 'Sprite size and magnification'],
+                     ['R2', 'Name base', 'D4-D7', '-', 'Name table at R2 x 400h; entries are two bytes in the extended modes'],
+                     ['R3', 'Colour base', 'all', '-', 'TMS9918A colour table; not used in the extended modes'],
+                     ['R4', 'Pattern base', 'D5-D7', '-', 'Pattern or bitmap table; D6-D7 are the third-banking mask with M3'],
+                     ['R5', 'SAT base', 'D1-D7', '-', 'Sprite attribute table at R5 x 80h'],
+                     ['R6', 'Sprite patterns', 'D5-D7', '-', 'Sprite pattern table at R6 x 800h; BANK adds 800h'],
+                     ['R7', 'Colours', 'D0-D3', '-', 'Text foreground; also the fallback ink of Text40X'],
+                     ['', '', 'D4-D7', '-', 'Backdrop, and the paper of the text modes'],
+                     ['R8', 'H scroll', 'D0-D4', '-', 'Horizontal scroll, whole columns'],
+                     ['', '', 'D5-D7', '-', 'Horizontal scroll, pixels. Sampled once per line'],
+                     ['R9', 'V scroll', 'all', '-', 'Vertical scroll, 0-191. Sampled once per line'],
+                     ['R10', 'Line count', 'all', '-', 'Lines between scanline interrupts, minus one'],
+                     ['R11', 'Mode', 'D0 IE1', '80h', 'Scanline interrupt enable'],
+                     ['', '', 'D6 MX', '02h', 'Extended display modes; requires XE'],
+                     ['', '', 'D7 XE', '01h', 'Extended enable: palette, S1, R8-R15, IE1'],
+                     ['R12', 'Screen', 'D4 HLOCK', '08h', 'Lines 0-15 are not scrolled horizontally'],
+                     ['', '', 'D5 VLOCK', '04h', 'Columns 24-31 are not scrolled vertically'],
+                     ['', '', 'D6 MASK', '02h', 'The leftmost eight pixels show the backdrop'],
+                     ['', '', 'D7 T64', '01h', '64-column text'],
+                     ['R13, R14', 'reserved', '-', '-', 'Write 00h'],
+                     ['R15', 'Status select', 'D4-D7', '-', '01h selects S1, any other value S0'],
+                     ['R63', 'Unlock', 'all', '-', 'Two consecutive writes of 5Ah unlock R8-R15'],
+                     ['S0', 'Status', 'D0 F', '80h', 'Frame interrupt flag; cleared on read'],
+                     ['', '', 'D1 5S', '40h', 'Ninth sprite on a line in the extended modes'],
+                     ['', '', 'D2 C', '20h', 'Sprite coincidence'],
+                     ['', '', 'D3-D7', '1Fh', 'Number of the reported sprite'],
+                     ['S1', 'Status', 'D0-D6', '3Eh mask', 'Identification: the masked value is 18h'],
+                     ['', '', 'D7 FL', '01h', 'Scanline interrupt flag; cleared on read']],
+                    [0.7 * inch, 0.95 * inch, 0.95 * inch, 0.7 * inch, W - 3.3 * inch], align_center_cols=(3,)),
+              tcaption('TABLE A-1 - COMPLETE REGISTER MAP')]
     story += [PageBreak()]
 
     story += [SectionMarker('B'), H(0, 'APPENDIX B - CPU TO VDP ACCESS TIMES')]
