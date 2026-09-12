@@ -27,8 +27,9 @@ Bit 0 is the MSB and bit 7 the LSB, as in SPPU004. Z80 examples use the SC-3000 
 - [3. TALKING TO THE TMS9918B](#3-talking-to-the-tms9918b) (3-1)
   - [3.1 Unlocking the Extended Registers](#31-unlocking-the-extended-registers) (3-1)
   - [3.2 Detecting the TMS9918B](#32-detecting-the-tms9918b) (3-1)
-  - [3.3 Writing the Palette](#33-writing-the-palette) (3-2)
-  - [3.4 Reading the Status Registers](#34-reading-the-status-registers) (3-2)
+  - [3.3 Register Aliasing While Locked](#33-register-aliasing-while-locked) (3-2)
+  - [3.4 Writing the Palette](#34-writing-the-palette) (3-2)
+  - [3.5 Reading the Status Registers](#35-reading-the-status-registers) (3-3)
 - [4. DESCRIPTION OF THE EXTENDED REGISTERS](#4-description-of-the-extended-registers) (4-1)
   - [4.1 Extended Write-Only Registers](#41-extended-write-only-registers) (4-1)
   - [4.2 Status Register S1](#42-status-register-s1) (4-2)
@@ -139,14 +140,14 @@ All TMS9918A transfers of SPPU004 Section 4 remain valid. The TMS9918B adds thre
 
 ### 3.1 Unlocking the Extended Registers
 
-After power-up the TMS9918B decodes register numbers like the TMS9918A (0 to 7). The unlock command is two consecutive writes of 5Ah to register 63. Both writes land in R7, so R7 must be written again afterwards.
+After power-up the TMS9918B decodes register numbers like the TMS9918A (0 to 7). The unlock command is two consecutive writes of 5Ah to register 59. Both writes land in R3, so R3 must be written again afterwards.
 
 | Operation | MSB 0 | 1 | 2 | 3 | 4 | 5 | 6 | LSB 7 | Hex | MODE |
 |---|---|---|---|---|---|---|---|---|---|---|
 | Data write (byte 1) | 0 | 1 | 0 | 1 | 1 | 0 | 1 | 0 | 5A | 1 |
-| Register select (byte 2) | 1 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | BF | 1 |
+| Register select (byte 2) | 1 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | BB | 1 |
 | Data write (byte 3) | 0 | 1 | 0 | 1 | 1 | 0 | 1 | 0 | 5A | 1 |
-| Register select (byte 4) | 1 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | BF | 1 |
+| Register select (byte 4) | 1 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | BB | 1 |
 
 **TABLE 3-1 - UNLOCK COMMAND**
 
@@ -157,17 +158,17 @@ After power-up the TMS9918B decodes register numbers like the TMS9918A (0 to 7).
 
 A program that uses extended functions must first verify the VDP. The sequence below is harmless on a TMS9918A, TMS9118, V9938 or F18A: every write that could land in another register is undone. Run it with interrupts disabled, because it reads the status register.
 
-- Unlock (Section 3.1) and restore R7.
-- Write 01h to R11 (XE). On other devices this lands in R3: restore R3.
+- Unlock (Section 3.1). Both key writes land in R3 on a locked device.
+- Write 01h to R11 (XE). On other devices this lands in R3, like the key writes.
 - Write 01h to R15 to select S1. On other devices this lands in R7.
 - Read the status port twice. On a TMS9918B the second value AND 3Eh equals 18h.
-- Write 00h to R15 to select S0 again, then restore R3 and R7.
+- Write 00h to R15 to select S0 again, then restore R3 and R7: the probe aliases only those two.
 
 **EXAMPLE 3-1. Detecting the TMS9918B**
 
 ```
 DETECT: DI
-        CALL UNLOCK        ; two writes of 5AH to register 63
+        CALL UNLOCK        ; two writes of 5AH to register 59
         LD   A,01H         ; XE
         LD   B,11
         CALL WRREG
@@ -193,7 +194,29 @@ DETECT: DI
         RET
 ```
 
-### 3.3 Writing the Palette
+### 3.3 Register Aliasing While Locked
+
+The TMS9918A decodes only the three low bits of a register number, and the TMS9918B does the same until it is unlocked. A write to register 8 therefore lands in R0, one to register 11 lands in R3, and so on. This is not a detail of the unlock command: it is the reason every probe in this guide restores a register afterwards, and the reason an extended program must detect the device before it writes anything above R7.
+
+| Extended register | Number AND 7 | Register written while locked | What happens if it is not restored |
+|---|---|---|---|
+| R8 horizontal scroll | 0 | R0 | the mode bit M3 and external video change: the display mode changes |
+| R9 vertical scroll | 1 | R1 | blanking, interrupt enable, mode bits and sprite size change |
+| R10 line count | 2 | R2 | the Name Table moves |
+| R11 mode (XE, MX, IE1) | 3 | R3 | the Colour Table moves |
+| R12 screen (T64, MASK, locks) | 4 | R4 | the Pattern Table moves |
+| R13, R14 reserved | 5, 6 | R5, R6 | the sprite tables move |
+| R15 status select | 7 | R7 | the text and backdrop colours change |
+| R59 unlock | 3 | R3 | the Colour Table moves, twice |
+
+**TABLE 3-3 - WHAT AN EXTENDED REGISTER WRITE DOES ON A LOCKED DEVICE**
+
+Two consequences are worth keeping in mind. The first is that the detection sequence of Section 3.2 is safe only because it restores R3 and R7, the two registers its own writes alias. The second is more serious: a program that scrolls by writing R8 every frame would be writing R0 on a TMS9918A, changing the display mode sixty times a second. Detect first, and keep the extended writes behind the test.
+
+> **NOTE**  
+> Aliasing disappears the moment the device is unlocked, and only a hardware RESET brings it back. Software that deliberately writes register numbers above 7 on a TMS9918A - a rare but legal practice - therefore behaves differently after the unlock. A program that hands control back to such software should write R11 = 00h, R12 = 00h, R8 = R9 = 00h and R15 = 00h, and request a hardware reset if it can.
+
+### 3.4 Writing the Palette
 
 With XE = 1, code 11 in the two most significant bits of the second control byte selects the palette. The first byte gives the entry number (0-15); every following write to the data port stores one entry and advances the entry number. The palette cannot be read back.
 
@@ -203,7 +226,7 @@ With XE = 1, code 11 in the two most significant bits of the second control byte
 | Palette select (byte 2) | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 1 |
 | Entry data (byte 3, 4 ...) | 0 | 0 | L | L | C | C | C | C | 0 |
 
-**TABLE 3-2 - WRITE TO PALETTE (E = ENTRY, L = LUMINANCE, C = COLOUR)**
+**TABLE 3-4 - WRITE TO PALETTE (E = ENTRY, L = LUMINANCE, C = COLOUR)**
 
 **EXAMPLE 3-2. Loading all 16 entries**
 
@@ -224,7 +247,7 @@ PALETTE:                   ; palette 0: -, white, grey, dark blue
         DB   00H,03H,02H,0CH ; palette 3: greens
 ```
 
-### 3.4 Reading the Status Registers
+### 3.5 Reading the Status Registers
 
 R15 selects the register returned by a status read: 01h selects S1, any other value S0. S1 contains the identification value 18h and, in its LSB (weight 01h), the scanline interrupt flag FL, which is cleared by the read. Leave R15 at 00h during normal operation so that frame interrupts are acknowledged as on the TMS9918A.
 
@@ -882,7 +905,7 @@ Every write-only register and every status register of the TMS9918B. Registers 0
 |  |  | D7 T64 | 01h | 64-column text |
 | R13, R14 | reserved | - | - | Write 00h |
 | R15 | Status select | D4-D7 | - | 01h selects S1, any other value S0 |
-| R63 | Unlock | all | - | Two consecutive writes of 5Ah unlock R8-R15 |
+| R59 | Unlock | all | - | Two consecutive writes of 5Ah unlock R8-R15 |
 | S0 | Status | D0 F | 80h | Frame interrupt flag; cleared on read |
 |  |  | D1 5S | 40h | Ninth sprite on a line in the extended modes |
 |  |  | D2 C | 20h | Sprite coincidence |

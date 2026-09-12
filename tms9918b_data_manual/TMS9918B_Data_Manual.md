@@ -30,7 +30,7 @@ The design rationale, cost analysis and rejected alternatives are in the separat
   - [2.1 CPU Interface](#21-cpu-interface) (2-1)
   - [2.2 Write-Only Registers](#22-write-only-registers) (2-1)
   - [2.3 Status Registers](#23-status-registers) (2-2)
-  - [2.4 Palette](#24-palette) (2-2)
+  - [2.4 Palette](#24-palette) (2-3)
   - [2.5 Video Display Modes](#25-video-display-modes) (2-3)
   - [2.6 Sprites](#26-sprites) (2-4)
   - [2.7 Scrolling and Scanline Interrupt](#27-scrolling-and-scanline-interrupt) (2-4)
@@ -124,10 +124,12 @@ A two-byte control transfer carries an address or a register value in the first 
 
 #### 2.1.2 Register unlock
 
-After reset the register number decodes three bits, as on the TMS9918A: register 8 aliases R0 and register 15 aliases R7. Two consecutive register writes of **5Ah** to register 63 (second byte **BFh**), without another register write in between, unlock registers 8 to 15. Only RESET locks them again. While locked the command lands in R7; software rewrites R7 afterwards.
+After reset the register number decodes three bits, as on the TMS9918A: register 8 aliases R0 and register 15 aliases R7. Two consecutive register writes of **5Ah** to register 59 (second byte **BBh**), without another register write in between, unlock registers 8 to 15. Only RESET locks them again. While locked the command lands in R3 (59 AND 7 = 3); software rewrites R3 afterwards, and the same restore also covers the XE write of Section 4.2, which aliases R3 too.
+
+While locked, a write to any register number above 7 lands in the register given by the three low bits: register 8 in R0, register 11 in R3, register 15 in R7. Software that uses the extended registers must therefore detect the device first (Section 4.2), and every probe must restore the registers its own writes aliased.
 
 > **NOTE**  
-> Register 63 and the value 5Ah do not collide with the F18A/PICO9918 unlock (1Ch to register 57, which lands in R1 on a locked TMS9918B) nor with R15, the status register select of the V9938 and F18A.
+> Register 59 and the value 5Ah do not collide with the F18A/PICO9918 unlock (1Ch to register 57, which lands in R1 on a locked TMS9918B) nor with R15, the status register select of the V9938 and F18A.
 
 #### 2.1.3 CPU access to VRAM
 
@@ -143,7 +145,7 @@ RESET clears R0, R1, R11 and R12, locks the extended registers and selects statu
 
 ### 2.2 Write-Only Registers
 
-Registers R0 to R7 keep their TMS9918A functions (MP010A Section 2.2). Registers R8 to R15 exist after the unlock command. Figure 2-1 shows the extended registers; reserved bits must be written as 0.
+Registers R0 to R7 keep their TMS9918A functions (MP010A Section 2.2). Registers R11 to R15 exist after the unlock command. Figure 2-1 shows the extended registers; reserved bits must be written as 0.
 
 **R8 H SCROLL** (D0 = MSB)
 
@@ -191,6 +193,12 @@ Registers R0 to R7 keep their TMS9918A functions (MP010A Section 2.2). Registers
 | D7 | T64 |
 
 **R13** (D0 = MSB)
+
+| Bits | Field |
+|---|---|
+| D0-D7 | RESERVED |
+
+**R14** (D0 = MSB)
 
 | Bits | Field |
 |---|---|
@@ -484,7 +492,7 @@ The TMS9918B replaces the TMS9918A or TMS9929A of an SC-3000 class system withou
 
 ### 4.2 Software Detection
 
-Recommended detection sequence: (1) run F18A/PICO9918 detection first if supported; (2) write 5Ah twice to register 63 and restore R7; (3) write 01h to R11 (XE, bit D7; lands in R3 on other devices, restore R3); (4) write 01h to R15, read the status port twice and compare the second value AND 3Eh with 18h; (5) write 00h to R15 and restore R3 and R7.
+Recommended detection sequence: (1) run F18A/PICO9918 detection first if supported; (2) write 5Ah twice to register 59; (3) write 01h to R11 (XE, bit D7); both land in R3 on other devices, so one restore of R3 covers them; (4) write 01h to R15, read the status port twice and compare the second value AND 3Eh with 18h; (5) write 00h to R15 and restore R3 and R7.
 
 ### 4.3 Initialization
 

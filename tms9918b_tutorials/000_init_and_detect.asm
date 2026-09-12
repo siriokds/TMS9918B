@@ -20,12 +20,10 @@ start:
         call vdp_set_registers
         call vdp_clear
 
-        ; The two key writes alias R7 while locked. Restore R7 immediately,
-        ; then enable the extension through R11. On a legacy chip R11 aliases R0.
-        ld hl,0x3F5A
+        ; The two key writes and the R11 write all alias R3 while locked
+        ; (59 AND 7 = 3, 11 AND 7 = 3), so one restore covers all three.
+        ld hl,0x3B5A
         call vdp_set_register
-        call vdp_set_register
-        ld hl,0x0701
         call vdp_set_register
         ld hl,0x0B01
         call vdp_set_register
@@ -43,7 +41,7 @@ start:
         ; safe probe before deciding whether the device answered correctly.
         ld hl,0x0F00
         call vdp_set_register
-        ld hl,0x0380            ; restore R3, aliased by the R11 write
+        ld hl,0x0380            ; restore R3, aliased by the key and R11 writes
         call vdp_set_register
         ld hl,0x0701
         call vdp_set_register

@@ -99,17 +99,6 @@ start:
         ld hl,registers_visible
         call vdp_set_registers
 
-        ; XE was active while the lesson prepared VRAM, so FL may already be
-        ; pending even though IE1 was disabled. Acknowledge both sources
-        ; before enabling CPU interrupts; the next four FL events then belong
-        ; to the first complete displayed frame measured by the lesson.
-        ld hl,0x0F01
-        call vdp_set_register
-        in a,(VDP_CTRL)
-        ld hl,0x0F00
-        call vdp_set_register
-        in a,(VDP_CTRL)
-
         im 1
         ei
 .idle:
@@ -130,10 +119,10 @@ interrupt:
         ld hl,0x0F00            ; back to S0 at once
         call vdp_set_register
         in a,(VDP_CTRL)
-        ld b,a                  ; S0: bit 7 is the frame flag
+        ld b,a                  ; S0: bit 0 is the frame flag
 
         bit 0,c
-        jr z,.check_frame
+        jr z,.frame_only
 
         ; Scanline interrupt: paint the band that starts on the next line.
         ld hl,IRQ_COUNT
@@ -143,9 +132,10 @@ interrupt:
         and 3
         ld (BAND),a
         call paint_band
+        jr .done
 
-.check_frame:
-        bit 7,b                 ; S0 F is bit 7 (TI D0)
+.frame_only:
+        bit 0,b
         jr z,.done
         ; Frame interrupt: the counter of the previous frame becomes the
         ; published value, the bands restart from the first one.
@@ -219,8 +209,8 @@ extended_registers:
         db 11, R11_XE|R11_MX|R11_IE1
         db 8, 0x00
         db 9, 0x00
-        db 10, 47               ; one interrupt every 48 displayed lines
-        db 12, R12_MASK
+        db 12, 47               ; one interrupt every 48 displayed lines
+        db 13, R12_MASK
         db 0xFF
 
 ; Colour of palette entry 5, that is entry 1 of palette 1, in each band.

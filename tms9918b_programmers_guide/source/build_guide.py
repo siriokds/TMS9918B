@@ -144,12 +144,12 @@ def build_story(entries):
                 'command, palette writes and status register selection.')]
     story += [H(1, '3.1 Unlocking the Extended Registers'),
               P('After power-up the TMS9918B decodes register numbers like the TMS9918A (0 to 7). The unlock command is two '
-                'consecutive writes of 5Ah to register 63. Both writes land in R7, so R7 must be written again afterwards.'),
+                'consecutive writes of 5Ah to register 59. Both writes land in R3, so R3 must be written again afterwards.'),
               table([['Operation', 'MSB 0', '1', '2', '3', '4', '5', '6', 'LSB 7', 'Hex', 'MODE'],
                      ['Data write (byte 1)', '0', '1', '0', '1', '1', '0', '1', '0', '5A', '1'],
-                     ['Register select (byte 2)', '1', '0', '1', '1', '1', '1', '1', '1', 'BF', '1'],
+                     ['Register select (byte 2)', '1', '0', '1', '1', '1', '1', '1', '1', 'BB', '1'],
                      ['Data write (byte 3)', '0', '1', '0', '1', '1', '0', '1', '0', '5A', '1'],
-                     ['Register select (byte 4)', '1', '0', '1', '1', '1', '1', '1', '1', 'BF', '1']],
+                     ['Register select (byte 4)', '1', '0', '1', '1', '1', '1', '1', '1', 'BB', '1']],
                     [1.5 * inch] + [0.37 * inch] * 8 + [0.45 * inch, W - 4.91 * inch], align_center_cols=tuple(range(1, 11))),
               tcaption('TABLE 3-1 - UNLOCK COMMAND'),
               note('Once unlocked, register numbers 8 to 15 address the extended registers. Only a hardware RESET locks them again.')]
@@ -157,14 +157,14 @@ def build_story(entries):
               P('A program that uses extended functions must first verify the VDP. The sequence below is harmless on a TMS9918A, '
                 'TMS9118, V9938 or F18A: every write that could land in another register is undone. Run it with interrupts '
                 'disabled, because it reads the status register.')]
-    story += B(['Unlock (Section 3.1) and restore R7.',
-                'Write 01h to R11 (XE). On other devices this lands in R3: restore R3.',
+    story += B(['Unlock (Section 3.1). Both key writes land in R3 on a locked device.',
+                'Write 01h to R11 (XE). On other devices this lands in R3, like the key writes.',
                 'Write 01h to R15 to select S1. On other devices this lands in R7.',
                 'Read the status port twice. On a TMS9918B the second value AND 3Eh equals 18h.',
-                'Write 00h to R15 to select S0 again, then restore R3 and R7.'])
+                'Write 00h to R15 to select S0 again, then restore R3 and R7: the probe aliases only those two.'])
     story += example('EXAMPLE 3-1. Detecting the TMS9918B', code('''
 DETECT: DI
-        CALL UNLOCK        ; two writes of 5AH to register 63
+        CALL UNLOCK        ; two writes of 5AH to register 59
         LD   A,01H         ; XE
         LD   B,11
         CALL WRREG
@@ -189,7 +189,32 @@ DETECT: DI
         EI
         RET
 '''))
-    story += [H(1, '3.3 Writing the Palette'),
+    story += [H(1, '3.3 Register Aliasing While Locked'),
+              P('The TMS9918A decodes only the three low bits of a register number, and the TMS9918B does the same until it is '
+                'unlocked. A write to register 8 therefore lands in R0, one to register 11 lands in R3, and so on. This is not a '
+                'detail of the unlock command: it is the reason every probe in this guide restores a register afterwards, and '
+                'the reason an extended program must detect the device before it writes anything above R7.'),
+              table([['Extended register', 'Number AND 7', 'Register written while locked', 'What happens if it is not restored'],
+                     ['R8 horizontal scroll', '0', 'R0', 'the mode bit M3 and external video change: the display mode changes'],
+                     ['R9 vertical scroll', '1', 'R1', 'blanking, interrupt enable, mode bits and sprite size change'],
+                     ['R10 line count', '2', 'R2', 'the Name Table moves'],
+                     ['R11 mode (XE, MX, IE1)', '3', 'R3', 'the Colour Table moves'],
+                     ['R12 screen (T64, MASK, locks)', '4', 'R4', 'the Pattern Table moves'],
+                     ['R13, R14 reserved', '5, 6', 'R5, R6', 'the sprite tables move'],
+                     ['R15 status select', '7', 'R7', 'the text and backdrop colours change'],
+                     ['R59 unlock', '3', 'R3', 'the Colour Table moves, twice']],
+                    [1.55 * inch, 0.75 * inch, 1.25 * inch, W - 3.55 * inch], align_center_cols=(1, 2)),
+              tcaption('TABLE 3-3 - WHAT AN EXTENDED REGISTER WRITE DOES ON A LOCKED DEVICE'),
+              P('Two consequences are worth keeping in mind. The first is that the detection sequence of Section 3.2 is safe '
+                'only because it restores R3 and R7, the two registers its own writes alias. The second is more serious: a '
+                'program that scrolls by writing R8 every frame would be writing R0 on a TMS9918A, changing the display mode '
+                'sixty times a second. Detect first, and keep the extended writes behind the test.'),
+              note('Aliasing disappears the moment the device is unlocked, and only a hardware RESET brings it back. Software '
+                   'that deliberately writes register numbers above 7 on a TMS9918A - a rare but legal practice - therefore '
+                   'behaves differently after the unlock. A program that hands control back to such software should write '
+                   'R11 = 00h, R12 = 00h, R8 = R9 = 00h and R15 = 00h, and request a hardware reset if it can.')]
+
+    story += [H(1, '3.4 Writing the Palette'),
               P('With XE = 1, code 11 in the two most significant bits of the second control byte selects the palette. The first '
                 'byte gives the entry number (0-15); every following write to the data port stores one entry and advances the '
                 'entry number. The palette cannot be read back.'),
@@ -198,7 +223,7 @@ DETECT: DI
                      ['Palette select (byte 2)', '1', '1', '0', '0', '0', '0', '0', '0', '1'],
                      ['Entry data (byte 3, 4 ...)', '0', '0', 'L', 'L', 'C', 'C', 'C', 'C', '0']],
                     [1.6 * inch] + [0.42 * inch] * 8 + [W - 4.96 * inch], align_center_cols=tuple(range(1, 10))),
-              tcaption('TABLE 3-2 - WRITE TO PALETTE (E = ENTRY, L = LUMINANCE, C = COLOUR)')]
+              tcaption('TABLE 3-4 - WRITE TO PALETTE (E = ENTRY, L = LUMINANCE, C = COLOUR)')]
     story += example('EXAMPLE 3-2. Loading all 16 entries', code('''
 LOADPAL:                   ; HL -> 16 palette bytes
         XOR  A
@@ -215,7 +240,7 @@ PALETTE:                   ; palette 0: -, white, grey, dark blue
         DB   00H,08H,09H,06H ; palette 2: reds
         DB   00H,03H,02H,0CH ; palette 3: greens
 '''))
-    story += [H(1, '3.4 Reading the Status Registers'),
+    story += [H(1, '3.5 Reading the Status Registers'),
               P('R15 selects the register returned by a status read: 01h selects S1, any other value S0. S1 contains the '
                 'identification value 18h and, in its LSB (weight 01h), the scanline interrupt flag FL, which is cleared by the '
                 'read. Leave R15 at 00h during normal operation so that frame interrupts are acknowledged as on the TMS9918A.')]
@@ -713,7 +738,7 @@ DONE:   POP  BC
                      ['', '', 'D7 T64', '01h', '64-column text'],
                      ['R13, R14', 'reserved', '-', '-', 'Write 00h'],
                      ['R15', 'Status select', 'D4-D7', '-', '01h selects S1, any other value S0'],
-                     ['R63', 'Unlock', 'all', '-', 'Two consecutive writes of 5Ah unlock R8-R15'],
+                     ['R59', 'Unlock', 'all', '-', 'Two consecutive writes of 5Ah unlock R8-R15'],
                      ['S0', 'Status', 'D0 F', '80h', 'Frame interrupt flag; cleared on read'],
                      ['', '', 'D1 5S', '40h', 'Ninth sprite on a line in the extended modes'],
                      ['', '', 'D2 C', '20h', 'Sprite coincidence'],

@@ -156,7 +156,7 @@ The same bursts leave more room for the CPU than the TMS9918A calendars did: 18 
 | Scroll registers, MASK, locks | Mark III (1985) | pixel scrolling without VRAM writes |
 | Scanline interrupt | Mark III, simplified | split screens, status bars, palette changes |
 | Hardware text cursor | terminal practice | blinking without rewriting characters |
-| Register 63 unlock, S1 = 18h | F18A and PICO9918 conventions | coexists with existing detection code |
+| Register 59 unlock, S1 = 18h | F18A and PICO9918 conventions | coexists with existing detection code |
 
 **TABLE 6-1 - FEATURES**
 
@@ -173,6 +173,7 @@ The same bursts leave more room for the CPU than the TMS9918A calendars did: 18 
 | Readable vertical counter | every raster effect is possible with the scanline interrupt |
 | Exact Mark III line counter | its reload and line 192 details serve no 1983 software |
 | Unlock through R15 | R15 is the status register select of the V9938 and F18A |
+| Unlock through register 63 | it works, but the PICO9918 uses register 63 for firmware updates. Register 59 is equally invisible to a V9938, which ignores every number above 46, and aliases R3 while locked - the same register the XE write aliases, so a probe restores one legacy register instead of two |
 | A second VRAM bank | kept for the TMS9918+; it needs a new board |
 | 150 ns RAM support | negative data setup margin in page mode |
 

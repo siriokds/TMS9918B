@@ -129,10 +129,14 @@ def build_story(entries):
               tcaption('TABLE 2-1 - CONTROL PORT CODES')]
     story += [H(2, '2.1.2 Register unlock'),
               P('After reset the register number decodes three bits, as on the TMS9918A: register 8 aliases R0 and register 15 '
-                'aliases R7. Two consecutive register writes of <b>5Ah</b> to register 63 (second byte <b>BFh</b>), without another '
+                'aliases R7. Two consecutive register writes of <b>5Ah</b> to register 59 (second byte <b>BBh</b>), without another '
                 'register write in between, unlock registers 8 to 15. Only RESET locks them again. While locked the command lands in '
-                'R7; software rewrites R7 afterwards.'),
-              note('Register 63 and the value 5Ah do not collide with the F18A/PICO9918 unlock (1Ch to register 57, which lands in R1 '
+                'R3 (59 AND 7 = 3); software rewrites R3 afterwards, and the same restore also covers the XE write of '
+            'Section 4.2, which aliases R3 too.'),
+              P('While locked, a write to any register number above 7 lands in the register given by the three low bits: register 8 '
+            'in R0, register 11 in R3, register 15 in R7. Software that uses the extended registers must therefore detect the '
+            'device first (Section 4.2), and every probe must restore the registers its own writes aliased.'),
+          note('Register 59 and the value 5Ah do not collide with the F18A/PICO9918 unlock (1Ch to register 57, which lands in R1 '
                    'on a locked TMS9918B) nor with R15, the status register select of the V9938 and F18A.'),
               H(2, '2.1.3 CPU access to VRAM'),
               P('The 14-bit autoincrementing address register, the read-ahead byte and the transfer sequences are those of the '
@@ -142,11 +146,11 @@ def build_story(entries):
               P('INT is active (low) when F = 1 and IE = 1 (frame interrupt, as on the TMS9918A) or when FL = 1 and IE1 = 1 '
                 '(scanline interrupt, Section 2.7). Reading S0 clears F; reading S1 clears FL.'),
               H(2, '2.1.5 VDP initialization'),
-              P('RESET clears R0, R1, R11 and R12, locks the extended registers and selects status register S0. The palette and '
+              P('RESET clears R0, R1, R11 and R12, locks the extended registers and selects status register S0. The palette, '
                 'R8-R10 and R13-R15 are undefined after power-up and must be written before extended modes are used.')]
 
     story += [H(1, '2.2 Write-Only Registers')]
-    story += [P('Registers R0 to R7 keep their TMS9918A functions (MP010A Section 2.2). Registers R8 to R15 exist after the unlock '
+    story += [P('Registers R0 to R7 keep their TMS9918A functions (MP010A Section 2.2). Registers R11 to R15 exist after the unlock '
                 'command. Figure 2-1 shows the extended registers; reserved bits must be written as 0.')]
     figs = [
         ('R8 H SCROLL', [('COLUMNS', 5), ('FINE', 3)]),
@@ -155,6 +159,7 @@ def build_story(entries):
         ('R11 MODE', [('IE1', 1), ('0', 1), ('0', 1), ('0', 1), ('0', 1), ('0', 1), ('MX', 1), ('XE', 1)]),
         ('R12 SCREEN', [('0', 1), ('0', 1), ('0', 1), ('0', 1), ('HLOCK', 1), ('VLOCK', 1), ('MASK', 1), ('T64', 1)]),
         ('R13', [('RESERVED', 8)]),
+        ('R14', [('RESERVED', 8)]),
         ('R14', [('RESERVED', 8)]),
         ('R15 STATUS SEL', [('0', 1), ('0', 1), ('0', 1), ('0', 1), ('STATUS REGISTER NUMBER', 4)]),
     ]
@@ -370,7 +375,7 @@ def build_story(entries):
           tcaption('TABLE 4-1 - VDP TO VRAM CONNECTIONS (AS TMS9918A, MP010A TABLE 3-1)'),
           H(1, '4.2 Software Detection'),
               P('Recommended detection sequence: (1) run F18A/PICO9918 detection first if supported; (2) write 5Ah twice to register '
-                '63 and restore R7; (3) write 01h to R11 (XE, bit D7; lands in R3 on other devices, restore R3); (4) write 01h to R15, read the '
+                '59; (3) write 01h to R11 (XE, bit D7); both land in R3 on other devices, so one restore of R3 covers them; (4) write 01h to R15, read the '
                 'status port twice and compare the second value AND 3Eh with 18h; (5) write 00h to R15 and restore R3 and R7.'),
               H(1, '4.3 Initialization'),
               P('Extended modes are selected by writing XE and MX in R11, M1-M3 in R0/R1 and the table bases in R2, R4, R5 and R6, and by '

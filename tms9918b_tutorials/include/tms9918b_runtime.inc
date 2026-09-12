@@ -121,35 +121,16 @@ mute_psg:
 .commands:
         db 0x9F,0xBF,0xDF,0xFF
 
-; Reading the status register clears F, 5S and C. Polling for F can therefore
-; consume a sprite flag raised earlier in the frame. Preserve the latest
-; 5S/index pair and accumulate C while waiting, then publish one complete
-; tutorial sample when F arrives.
+; Reading the status register clears F, 5S and C, so the byte is kept: a
+; lesson that wants the sprite flags of the frame must use VDP_STATUS instead
+; of reading the port again.
 VDP_STATUS:     equ 0xC10F
 
 wait_vblank:
-        xor a
-        ld (VDP_STATUS),a
-.poll:
         in a,(VDP_CTRL)
-        bit 6,a
-        jr z,.collision
         ld (VDP_STATUS),a
-
-.collision:
-        bit 5,a
-        jr z,.frame
-        push af
-        ld a,(VDP_STATUS)
-        or 0x20
-        ld (VDP_STATUS),a
-        pop af
-.frame:
-        bit 7,a
-        jr z,.poll
-        ld a,(VDP_STATUS)
-        or 0x80
-        ld (VDP_STATUS),a
+        and 0x80
+        jr z,wait_vblank
         ret
 
 freeze:

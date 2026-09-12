@@ -38,16 +38,16 @@ LUM_1_4:        equ 0x30
 PALETTE_WRITE:  equ 0xC0        ; control code 11 with XE = 1
 
 ; Unlock the extended registers, enable XE and verify the S1 identification.
+; While the device is locked the probe touches two legacy registers only:
+; register 59 and register 11 both land in R3, register 15 lands in R7.
 ; Returns with XE set on a TMS9918B. On any other device every aliased legacy
 ; register is restored, a red screen is displayed and the program stops: a
 ; lesson that needs the extension never runs on a device that lacks it.
 tms9918b_require:
-        ld hl,0x3F5A            ; register 63, key value
+        ld hl,0x3B5A            ; register 59, key value
         call vdp_set_register
         call vdp_set_register
-        ld hl,0x0701            ; both key writes aliased R7 while locked
-        call vdp_set_register
-        ld hl,0x0B00+R11_XE     ; register 11; aliases R3 on a locked device
+        ld hl,0x0B00+R11_XE     ; register 11; aliases R3, like the key writes
         call vdp_set_register
         ld hl,0x0F01            ; select S1; aliases R7 on a locked device
         call vdp_set_register
@@ -57,12 +57,12 @@ tms9918b_require:
         ld c,a
         ld hl,0x0F00            ; back to S0 before anything else
         call vdp_set_register
+        ld hl,0x0300            ; restore R3: the key writes and R11 alias it
+        call vdp_set_register
         ld a,c
         cp 0x18
         ret z
-        ld hl,0x0300            ; restore R3, aliased by the R11 write
-        call vdp_set_register
-        ld hl,0x0706            ; red backdrop
+        ld hl,0x0706            ; restore R7, aliased by R15, with a red backdrop
         call vdp_set_register
         ld hl,0x01C0            ; display on, Graphics I, empty tables
         call vdp_set_register

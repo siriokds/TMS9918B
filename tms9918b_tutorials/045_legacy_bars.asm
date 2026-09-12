@@ -33,10 +33,8 @@ start:
         ; locked device simply keeps the first two states.
         xor a
         ld (BAR_EXTENDED),a
-        ld hl,0x3F5A
+        ld hl,0x3B5A
         call vdp_set_register
-        call vdp_set_register
-        ld hl,0x0701
         call vdp_set_register
         ld hl,0x0B01
         call vdp_set_register
