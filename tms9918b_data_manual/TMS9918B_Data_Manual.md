@@ -33,7 +33,7 @@ The design rationale, cost analysis and rejected alternatives are in the separat
   - [2.4 Palette](#24-palette) (2-3)
   - [2.5 Video Display Modes](#25-video-display-modes) (2-3)
   - [2.6 Sprites](#26-sprites) (2-4)
-  - [2.7 Scrolling and Scanline Interrupt](#27-scrolling-and-scanline-interrupt) (2-4)
+  - [2.7 Scrolling and Scanline Interrupt](#27-scrolling-and-scanline-interrupt) (2-5)
 - [3. VDP INTERFACES AND OPERATION](#3-vdp-interfaces-and-operation) (3-1)
   - [3.1 VDP/VRAM Interface](#31-vdpvram-interface) (3-1)
   - [3.2 VRAM Memory Address Derivation](#32-vram-memory-address-derivation) (3-2)
@@ -340,7 +340,9 @@ Text40X keeps the 40 x 24 layout of Text mode with a 2-byte entry per character:
 
 With T64 = 1 the VDP displays 64 x 24 characters of 8 x 8 pixels on 512-pixel lines (one name byte per character, all 8 pattern bits used). The two colours of the whole screen come from R7. Monitors with RGB or component input are required for legible 64-column text.
 
-In both text modes sprites 0 and 1 are displayed as a hardware cursor (a pair when sprite 1 has PAIR set); in 64-column text the sprite X coordinate is doubled.
+In both text modes sprites 0 and 1 are displayed over the text, a pair when sprite 1 has PAIR set; sprites 2 to 31 are not displayed, because a text line has no room to read their vertical positions. Their patterns are not stretched: a sprite eight pixels wide covers one character cell in every mode.
+
+At 64 columns the picture is 512 pixels wide and the X byte reaches 255, so in that mode the coordinate counts two-pixel steps and XFINE, bit 1 of the colour byte, supplies the odd pixel: the sprite is displayed at 2 x X + XFINE. A cursor sits on a character boundary and leaves XFINE at 0; an object that moves needs it, otherwise it would cross the line in 256 steps instead of 512. The bit is the low one of the position and not a ninth bit at the top so that an update caught between the two writes costs one pixel for one frame instead of 256, and so that software which ignores it behaves as it always did.
 
 ### 2.6 Sprites
 
@@ -351,7 +353,7 @@ The Sprite Attribute Table and Sprite Pattern Table keep the TMS9918A layout. In
 | Bits | Field |
 |---|---|
 | D0 | EC |
-| D1 | 0 |
+| D1 | XFINE |
 | D2 | BANK |
 | D3 | PAIR |
 | D4-D5 | PALETTE |
@@ -361,7 +363,8 @@ The Sprite Attribute Table and Sprite Pattern Table keep the TMS9918A layout. In
 
 | Field | Function |
 |---|---|
-| EC | Early clock: X - 32, as TMS9918A. |
+| EC | Early clock: X - 32, as TMS9918A. It acts on the coarse coordinate, so in a 512-pixel mode the sprite moves left by 64 pixels. |
+| XFINE | In a 512-pixel mode, the low bit of the horizontal position: the sprite is displayed at 2 x X + XFINE. Channels 0 and 1 only; reserved and written as 0 in every other mode. |
 | BANK | Pattern taken from the 2048-byte table that follows the one located by R6. |
 | PAIR | Odd sprites only: sprite 2k+1 becomes the second bit plane of sprite 2k. |
 | PALETTE, ENTRY | Single sprite colour: entry 1-3 of the palette; entry 0 makes the sprite invisible (it still takes part in coincidence). |

@@ -244,16 +244,24 @@ def build_story(entries):
               P('With T64 = 1 the VDP displays 64 x 24 characters of 8 x 8 pixels on 512-pixel lines (one name byte per character, '
                 'all 8 pattern bits used). The two colours of the whole screen come from R7. Monitors with RGB or component input '
                 'are required for legible 64-column text.'),
-              P('In both text modes sprites 0 and 1 are displayed as a hardware cursor (a pair when sprite 1 has PAIR set); in 64-column '
-                'text the sprite X coordinate is doubled.')]
+              P('In both text modes sprites 0 and 1 are displayed over the text, a pair when sprite 1 has PAIR set; sprites 2 to '
+                '31 are not displayed, because a text line has no room to read their vertical positions. Their patterns are '
+                'not stretched: a sprite eight pixels wide covers one character cell in every mode.'),
+              P('At 64 columns the picture is 512 pixels wide and the X byte reaches 255, so in that mode the coordinate '
+                'counts two-pixel steps and XFINE, bit 1 of the colour byte, supplies the odd pixel: the sprite is displayed '
+                'at 2 x X + XFINE. A cursor sits on a character boundary and leaves XFINE at 0; an object that moves needs it, '
+                'otherwise it would cross the line in 256 steps instead of 512. The bit is the low one of the position and not '
+                'a ninth bit at the top so that an update caught between the two writes costs one pixel for one frame instead '
+                'of 256, and so that software which ignores it behaves as it always did.')]
 
     story += [H(1, '2.6 Sprites')]
     story += [P('The Sprite Attribute Table and Sprite Pattern Table keep the TMS9918A layout. In extended graphics modes the fourth '
                 'attribute byte has the format of Figure 2-5 and up to eight sprites are displayed per line.'),
-              register_figure('COLOUR BYTE', [('EC', 1), ('0', 1), ('BANK', 1), ('PAIR', 1), ('PALETTE', 2), ('ENTRY', 2)]),
+              register_figure('COLOUR BYTE', [('EC', 1), ('XFINE', 1), ('BANK', 1), ('PAIR', 1), ('PALETTE', 2), ('ENTRY', 2)]),
               caption('FIGURE 2-5 - SPRITE ATTRIBUTE BYTE 3 IN EXTENDED MODES')]
     story += [table([['Field', 'Function'],
-                     ['EC', 'Early clock: X - 32, as TMS9918A.'],
+                     ['EC', 'Early clock: X - 32, as TMS9918A. It acts on the coarse coordinate, so in a 512-pixel mode the sprite moves left by 64 pixels.'],
+                 ['XFINE', 'In a 512-pixel mode, the low bit of the horizontal position: the sprite is displayed at 2 x X + XFINE. Channels 0 and 1 only; reserved and written as 0 in every other mode.'],
                      ['BANK', 'Pattern taken from the 2048-byte table that follows the one located by R6.'],
                      ['PAIR', 'Odd sprites only: sprite 2k+1 becomes the second bit plane of sprite 2k.'],
                      ['PALETTE, ENTRY', 'Single sprite colour: entry 1-3 of the palette; entry 0 makes the sprite invisible '

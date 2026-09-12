@@ -7,6 +7,11 @@
 ; The cursor position comes from the caller:
 ;   B = raw Y (one less than the first visible line)
 ;   C = X: pixels at forty columns, two-pixel steps at sixty-four
+;
+; At 64 columns the picture has 512 pixels, so X counts two-pixel steps and
+; XFINE, bit 1 of the colour byte, supplies the odd pixel. A cursor sits on a
+; character boundary and never needs it; a pointer does (Programmer's Guide
+; section 8.5).
 
 CURSOR_STATE:   equ 0xC120
 CURSOR_TIMER:   equ 0xC121

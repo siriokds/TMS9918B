@@ -151,6 +151,7 @@ The same bursts leave more room for the CPU than the TMS9918A calendars did: 18 
 | Text64 | terminals with narrow characters | 80 columns did not fit; 64 x 24 at 512 pixels did |
 | 8 sprites per line | Famicom (1983), V9938 (1985) | fits the blanking with SAT bursts |
 | Sprite pairs (PAIR) | TI Programmer's Guide sprite overlay (section 10.2); V9938 CC bit | three colours and meaningful collisions for about 90 transistors |
+| XFINE: the free bit of the sprite colour byte is the low bit of X in 512-pixel modes | the low bit of the sprite index; a ninth X bit in the same place | Without it an object crosses a 512-pixel line in 256 steps and the movement is visibly stepped; a cursor does not care, anything that moves does. A ninth bit at the top would make a half-written update jump a sprite by 256 pixels, while as a low bit the same accident costs one pixel for one frame, and software that ignores XFINE keeps the behaviour it had. Taking the bit from the sprite index would tie a position to a table entry and break sprite pairs. About 25 transistors, on the two channels the text modes display. |
 | BANK: 512 sprite patterns | Mark III: sprites use either of two 256-pattern sets | mirrored frames stored instead of hardware flips |
 | Tile priority | Famicom, Mark III | software cannot put tiles in front of sprites |
 | Scroll registers, MASK, locks | Mark III (1985) | pixel scrolling without VRAM writes |

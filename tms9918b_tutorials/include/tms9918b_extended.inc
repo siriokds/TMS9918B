@@ -24,7 +24,8 @@ ATTR_PRIOR:     equ 0x04        ; D5: tile in front of every sprite
 ATTR_PALETTE:   equ 0x03        ; D6..D7: palette 0..3
 
 ; --- sprite attribute byte 3 in extended modes -------------------------------
-SPR_EC:         equ 0x80        ; D0: early clock
+SPR_EC:         equ 0x80        ; D0: early clock (64 pixels in a 512-pixel mode)
+SPR_XFINE:      equ 0x40        ; D1: low bit of X in 512-pixel modes; 0 elsewhere
 SPR_BANK:       equ 0x20        ; D2: second sprite pattern table
 SPR_PAIR:       equ 0x10        ; D3: odd sprite becomes the second bit plane
 SPR_PALETTE:    equ 0x0C        ; D4..D5: palette 0..3

@@ -53,7 +53,7 @@ Bit 0 is the MSB and bit 7 the LSB, as in SPPU004. Z80 examples use the SC-3000 
   - [8.2 BANK](#82-bank) (8-1)
   - [8.3 Sprite Pairs](#83-sprite-pairs) (8-1)
   - [8.4 Sprites per Line](#84-sprites-per-line) (8-1)
-  - [8.5 Hardware Cursor](#85-hardware-cursor) (8-1)
+  - [8.5 Sprites in the Text Modes](#85-sprites-in-the-text-modes) (8-1)
 - [9. SCROLLING](#9-scrolling) (9-1)
   - [9.1 The World and the Screen](#91-the-world-and-the-screen) (9-1)
   - [9.2 What the VDP Does With Them](#92-what-the-vdp-does-with-them) (9-1)
@@ -615,7 +615,7 @@ The Sprite Attribute Table keeps its four-byte entries (SPPU004 Section 9.2). On
 | Bits | Field |
 |---|---|
 | D0 | EC |
-| D1 | 0 |
+| D1 | XFINE |
 | D2 | BANK |
 | D3 | PAIR |
 | D4-D5 | PALETTE |
@@ -648,11 +648,100 @@ SAT:    DB   60H,78H,00H,05H  ; sprite 0: Y, X, name 00H, palette 1 entry 1
 
 Eight sprites can share a horizontal line in Graphics1X, Graphics2Fat and Bitmap modes. The TMS9918B selects the sprites of two lines at a time, so a sprite that ends on the first line of a pair still counts on the second one. When a ninth sprite is found, 5S is set and its number is loaded into S0; sprites of higher number are not displayed on those lines. A pair uses two of the eight sprites.
 
-### 8.5 Hardware Cursor
+### 8.5 Sprites in the Text Modes
 
-In Text40X and Text64 modes sprites 0 and 1 are displayed as a cursor over the text; sprites 2-31 are ignored. In Text64 the horizontal coordinate counts in two-pixel steps: X = 4 x column places the cursor on that column. Blink the cursor by alternating the ENTRY bits between 0 and a colour every 30 frames.
+Text40X, Text40XQ, Text64 and Text64Q display sprites 0 and 1 and ignore sprites 2 to 31. Two is what the memory access sequence of a text line affords: the VDP reads the vertical position of every sprite before it can decide which ones belong to a line, and a text line has only sixteen spare cycles. In every other respect these two behave like the sprites of the graphics modes - same table, same patterns, same palette - and PAIR still combines them into one three-colour object.
 
-**EXAMPLE 8-2. Blinking the cursor from the frame interrupt**
+Their patterns are not stretched. In a 64-column mode the picture is 512 pixels wide and a sprite pixel is one of those pixels, not two, so an 8x8 sprite covers exactly one character cell and a 16x16 sprite covers two. A VDP that already shifts 512 pixels per line has no reason to double them again, and this is what makes a cursor the size of the character it sits on.
+
+#### 8.5.1 A Blinking Cursor
+
+A text cursor sits on a character boundary, so its position is a multiple of the cell width and never needs anything finer. Set X once and leave it; to blink, alternate the ENTRY bits of the colour byte between a colour and 0, which makes the sprite invisible. One byte every thirty frames, and no pattern is rewritten.
+
+#### 8.5.2 Why the X Byte Is Not Enough at 64 Columns
+
+The X byte holds 0 to 255. A 40-column screen is 256 pixels wide, so the byte reaches every pixel of it. A 64-column screen is 512 pixels wide and the byte reaches half of them. Something has to supply the missing bit.
+
+In a 512-pixel mode the TMS9918B reads the X byte as a count of two-pixel steps, so a sprite can sit on any even pixel: X = 4 * column places it on a character boundary. The odd pixels come from XFINE, bit 1 of the colour byte, which is unused in every other mode:
+
+```
+SCREEN X = 2 x X + XFINE
+```
+
+| Screen column | X byte | XFINE |
+|---|---|---|
+| 0, the first character | 0 | 0 |
+| 1 | 0 | 1 |
+| 8, the second character | 4 | 0 |
+| 201 | 100 | 1 |
+| 510 | 255 | 0 |
+| 511 | 255 | 1 |
+
+**TABLE 8-3 - SPRITE POSITIONS AT 64 COLUMNS**
+
+> **NOTE**  
+> XFINE applies to sprites 0 and 1, the only ones a text mode displays, and only in a 512-pixel mode. Everywhere else the bit is reserved and must be written as 0, so that it remains available.
+
+#### 8.5.3 Smooth Movement
+
+A cursor never needs XFINE. Anything that moves does. An object crossing a 512-pixel line in two-pixel steps covers it in 256 steps instead of 512, and at any speed slow enough to be followed by the eye the movement is visibly stepped - a pointer, a selection bar sliding along a menu, a marker following a waveform. The same object with XFINE moves one pixel at a time.
+
+This is the whole purpose of the bit. It is not tied to a pointing device: it is what makes horizontal movement at 64 columns as smooth as it is at 40, where the X byte already addresses every pixel.
+
+#### 8.5.4 Why the Bit Is the Low One
+
+The obvious place for a missing bit is the top: keep X as a count of pixels and let the spare bit carry the value 256. The TMS9918B does the opposite, and the reason is what happens while software is writing.
+
+A position lives in two bytes of the Sprite Attribute Table and the VDP reads that table once per line, so a program that moves a sprite has a window in which one byte is new and the other still old. With the bit at the top, an update caught in that window puts the sprite 256 pixels from where it belongs for one frame, which the eye reads as a flash on the other side of the screen. With the bit at the bottom the same accident leaves it one pixel out, which nobody sees.
+
+The two bytes are not two halves of one number. X places the sprite to within a pixel and XFINE moves it by that pixel, exactly as the column bits and the fine bits of R8 do for the playfield. Writing X first and XFINE second is therefore the natural order and needs no protection: after the first write the sprite is already almost where it belongs.
+
+There is a second advantage. Software that knows nothing about XFINE writes 0 there and gets exactly the behaviour it expects, so the bit refines a coordinate instead of redefining it.
+
+> **NOTE**  
+> Two alternatives were rejected. Taking the low bit from the sprite number - even sprites on even pixels, odd sprites on odd ones - costs less silicon but ties a position to a table entry: moving an object from one sprite to another would move it by a pixel, and the two bit planes of a PAIR would land on different columns. Leaving the coordinate at two-pixel steps costs nothing and is enough for a cursor, but not for anything that moves.
+
+#### 8.5.5 Early Clock at 64 Columns
+
+EC subtracts 32 from the coordinate, and the coordinate is the coarse one, so in a 512-pixel mode a sprite moves left by 64 pixels rather than 32. The purpose is unchanged, letting a sprite enter from the left edge, and the distance is the width of eight characters.
+
+#### 8.5.6 Writing a Position
+
+The four bytes of an entry are adjacent and the address register increments after every write, so one address setup sends the whole entry: Y, X, pattern name and colour byte. That is the cheapest way to move an object and it leaves the shortest window, because X and XFINE are two writes apart rather than a second address setup apart.
+
+The window closes entirely if the table is written during vertical blanking, where the VDP reads nothing and 4300 microseconds are available, room for all 32 entries. A program that moves an object from a scanline interrupt does not have that luxury and does not need it: the worst it can suffer is the one-pixel offset described above.
+
+**EXAMPLE 8-2. Moving a pointer to any of the 512 columns**
+
+```
+; HL = column 0..511, B = raw Y, C = pattern name, A = colour byte with XFINE
+; clear. The four bytes of the entry are written in one go: the address
+; register increments, so one setup covers them all.
+POINTER:
+        LD   (COLSHADOW),A
+        SRL  H
+        RR   L             ; HL = column / 2 = the X byte
+        LD   A,L
+        LD   (XSHADOW),A
+        LD   HL,SAT        ; the sprite 0 entry
+        CALL SETWR
+        LD   A,B
+        OUT  (VDPDAT),A    ; Y
+        LD   A,(XSHADOW)
+        OUT  (VDPDAT),A    ; X, two-pixel steps
+        LD   A,C
+        OUT  (VDPDAT),A    ; pattern name
+        LD   A,E           ; E holds the column LSB saved by the caller
+        AND  01H
+        RRCA
+        RRCA               ; bit 0 becomes XFINE, weight 40H
+        LD   HL,COLSHADOW
+        OR   (HL)
+        OUT  (VDPDAT),A    ; colour byte with XFINE
+        RET
+```
+
+**EXAMPLE 8-3. Blinking the cursor from the frame interrupt**
 
 ```
 BLINK:  LD   HL,BLINKCNT
