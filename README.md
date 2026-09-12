@@ -18,6 +18,7 @@ it verified against the data sheets of the RAMs and the timing of the original c
 | **Programmer's Guide Supplement** (TB-9918B-02) — unlocking, initialization, patterns, sprites, scrolling, Z80 examples | [Markdown](tms9918b_programmers_guide/TMS9918B_Programmers_Guide_Supplement.md) | [PDF](tms9918b_programmers_guide/TMS9918B_Programmers_Guide_Supplement.pdf) |
 | **Design Notes** (TB-9918B-03) — 1983 setting, memory constraints, precedents, rejected alternatives, cost | [Markdown](tms9918b_design_notes/TMS9918B_Design_Notes.md) | [PDF](tms9918b_design_notes/TMS9918B_Design_Notes.pdf) |
 | **Model** — unit-exact VRAM calendars, DRAM verification, CPU timing, tests | [README](tms9918b_model/README.md) | — |
+| **Library** — the chip in two C99 files, a scanline renderer ready to drop into an emulator | [README](tms9918b_library/README.md) | — |
 | **Tutorials** — 33 Z80 ROMs, one per mode and feature, built with sjasmplus | [README](tms9918b_tutorials/README.md) | — |
 
 The two manuals follow the structure and conventions of TI's own documents, the *TMS9918A/9928A/9929A Data
@@ -38,6 +39,7 @@ bit 0 = MSB numbering.
   [sprite pairs](tms9918b_programmers_guide/TMS9918B_Programmers_Guide_Supplement.md#83-sprite-pairs) ·
   [scanline interrupts](tms9918b_programmers_guide/TMS9918B_Programmers_Guide_Supplement.md#92-scanline-interrupts) ·
   [Z80 routines](tms9918b_programmers_guide/TMS9918B_Programmers_Guide_Supplement.md#appendix-d---z80-support-routines)
+- Integrating: [the C99 library](tms9918b_library/README.md) · [compatibility levels](COMPATIBILITY.md)
 - Generated data: [VRAM calendars, every cycle of every line](tms9918b_model/docs/generated/calendars.md) ·
   [DRAM data sheet verification](tms9918b_model/docs/generated/dram_timing.md) ·
   [CPU access times](tms9918b_model/docs/generated/cpu_timing.md)
@@ -109,6 +111,10 @@ in 64 columns, 150 ns RAMs.
 │   ├── images_guide/                    memory maps (SVG)
 │   └── source/
 ├── tms9918b_tutorials/                  33 lessons, shared includes, build.sh
+├── tms9918b_library/                    the chip as two C99 files
+│   ├── tms9918b.c
+│   ├── tms9918b.h
+│   └── README.md
 └── tms9918b_model/
     ├── src/                             calendars, cycle timing, addresses, modes, analysis
     │   └── tms99xx/                     TMS99xx slot grid, schedules, VRAM sequencer
@@ -125,6 +131,12 @@ in 64 columns, 150 ns RAMs.
 python3 tms9918b_data_manual/source/build_datasheet.py tms9918b_data_manual/TMS9918B_Data_Manual.pdf
 python3 tms9918b_programmers_guide/source/build_guide.py tms9918b_programmers_guide/TMS9918B_Programmers_Guide_Supplement.pdf
 python3 tms9918b_design_notes/source/build_notes.py tms9918b_design_notes/TMS9918B_Design_Notes.pdf
+```
+
+**Library** (C99, no dependencies) — two files to copy, or to compile on their own:
+
+```sh
+cc -std=c99 -Wall -Wextra -c tms9918b_library/tms9918b.c
 ```
 
 **Model** (C++17, self-contained):
@@ -147,7 +159,7 @@ g++ -std=c++17 -O2 -Isrc -Isrc/tms99xx tools/tms9918b_report.cpp src/TMS9918BCal
 | Programmer's Guide Supplement | complete |
 | Design Notes (history, costs, rejected alternatives) | complete |
 | Compatibility guidelines | complete |
-| Emulator integration guide | planned |
+| C99 library | complete — every mode, sprites, scrolling, scanline interrupt |
 
 Open assumptions are listed in the [model README](tms9918b_model/README.md#open-points): VDP input setup of
 40 ns with a 20 ns board delay budget, and sprite selection over line pairs.
@@ -160,11 +172,17 @@ themselves compatible follow the [compatibility guidelines](COMPATIBILITY.md), w
 (TMS9918A mode, TMS9918B functional, TMS9918B timing), the reference tests for each, and conventions for
 integrating the chip in hardware and writing software around it.
 
+There is no need to start from nothing. [`tms9918b_library/`](tms9918b_library/README.md) is the whole chip in
+two C99 files with no dependencies: port writes in, one scanline out. It reaches level 2 of the guidelines and
+serves equally as a starting point for a new implementation or as a second opinion while checking one's own. The
+model answers a different question — whether the device could have been built in 1983 — and is the place to look
+for memory cycles, CPU access windows and everything the library deliberately leaves out.
+
 ## License
 
 | Part | License | File |
 |---|---|---|
-| Reference model, tests, tools, document generators | Apache License 2.0 | [LICENSE](LICENSE) |
+| Reference model, C99 library, tests, tools, document generators | Apache License 2.0 | [LICENSE](LICENSE) |
 | Data Manual, Programmer's Guide Supplement, Design Notes, README and guideline files | Creative Commons Attribution 4.0 (CC BY 4.0) | [LICENSE-DOCS](LICENSE-DOCS) |
 | Example programs in the Programmer's Guide | CC BY 4.0 or, at your choice, Apache License 2.0 | — |
 
