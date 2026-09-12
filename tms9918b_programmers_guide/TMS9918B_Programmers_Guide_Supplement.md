@@ -650,9 +650,9 @@ Eight sprites can share a horizontal line in Graphics1X, Graphics2Fat and Bitmap
 
 ### 8.5 Sprites in the Text Modes
 
-Text40X, Text40XQ, Text64 and Text64Q display sprites 0 and 1 and ignore sprites 2 to 31. Two is what the memory access sequence of a text line affords: the VDP reads the vertical position of every sprite before it can decide which ones belong to a line, and a text line has only sixteen spare cycles. In every other respect these two behave like the sprites of the graphics modes - same table, same patterns, same palette - and PAIR still combines them into one three-colour object.
+Text40X, Text40XQ, Text64 and Text64Q display sprites 0 and 1 and ignore sprites 2 to 31. The extended text memory calendar reserves sprite bandwidth for those two fixed SAT entries and does not scan entries 2 to 31. In every other respect these two behave like the sprites of the graphics modes - same table, same patterns, same palette - and PAIR still combines them into one three-colour object.
 
-Their patterns are not stretched. In a 64-column mode the picture is 512 pixels wide and a sprite pixel is one of those pixels, not two, so an 8x8 sprite covers exactly one character cell and a 16x16 sprite covers two. A VDP that already shifts 512 pixels per line has no reason to double them again, and this is what makes a cursor the size of the character it sits on.
+Their patterns are not stretched. In a 64-column mode the picture is 512 pixels wide and a sprite pixel is one of those pixels, not two, so an 8x8 sprite covers exactly one eight-pixel character cell and a 16x16 sprite covers two. In Text40X the same 8x8 sprite spans eight output pixels and is wider than a six-pixel text cell. A VDP that already shifts 512 pixels per line has no reason to double sprite pixels again, and this is what makes a Text64 cursor the size of the character it sits on.
 
 #### 8.5.1 A Blinking Cursor
 
@@ -719,6 +719,9 @@ The window closes entirely if the table is written during vertical blanking, whe
 ; register increments, so one setup covers them all.
 POINTER:
         LD   (COLSHADOW),A
+        LD   A,L
+        AND  01H
+        LD   (XFINE_SHADOW),A
         SRL  H
         RR   L             ; HL = column / 2 = the X byte
         LD   A,L
@@ -731,8 +734,7 @@ POINTER:
         OUT  (VDPDAT),A    ; X, two-pixel steps
         LD   A,C
         OUT  (VDPDAT),A    ; pattern name
-        LD   A,E           ; E holds the column LSB saved by the caller
-        AND  01H
+        LD   A,(XFINE_SHADOW)
         RRCA
         RRCA               ; bit 0 becomes XFINE, weight 40H
         LD   HL,COLSHADOW

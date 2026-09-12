@@ -245,8 +245,10 @@ def build_story(entries):
                 'all 8 pattern bits used). The two colours of the whole screen come from R7. Monitors with RGB or component input '
                 'are required for legible 64-column text.'),
               P('In both text modes sprites 0 and 1 are displayed over the text, a pair when sprite 1 has PAIR set; sprites 2 to '
-                '31 are not displayed, because a text line has no room to read their vertical positions. Their patterns are '
-                'not stretched: a sprite eight pixels wide covers one character cell in every mode.'),
+                '31 are not displayed. The extended text memory calendar reserves sprite bandwidth for those two fixed SAT '
+                'entries and does not scan entries 2 to 31. Their patterns are not stretched. In Text64 an eight-pixel sprite '
+                'covers exactly one eight-pixel character cell; in Text40X it spans eight output pixels and is wider than a '
+                'six-pixel text cell.'),
               P('At 64 columns the picture is 512 pixels wide and the X byte reaches 255, so in that mode the coordinate '
                 'counts two-pixel steps and XFINE, bit 1 of the colour byte, supplies the odd pixel: the sprite is displayed '
                 'at 2 x X + XFINE. A cursor sits on a character boundary and leaves XFINE at 0; an object that moves needs it, '
