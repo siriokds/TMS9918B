@@ -100,7 +100,7 @@ start:
 
 .frame:
         call wait_vblank
-        in a,(VDP_CTRL)         ; S0: 5S and the number of the ninth sprite
+        ld a,(VDP_STATUS)       ; accumulated S0: 5S and ninth-sprite index
         ld (STATUS_BYTE),a
         jr .frame
 

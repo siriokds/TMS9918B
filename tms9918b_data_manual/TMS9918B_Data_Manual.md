@@ -139,11 +139,11 @@ INT is active (low) when F = 1 and IE = 1 (frame interrupt, as on the TMS9918A) 
 
 #### 2.1.5 VDP initialization
 
-RESET clears R0, R1, R11 and R12, locks the extended registers and selects status register S0. The palette and R8 to R15 are undefined after power-up and must be written before extended modes are used.
+RESET clears R0, R1, R11 and R12, locks the extended registers and selects status register S0. The palette, R8-R10 and R13-R15 are undefined after power-up and must be written before extended modes are used.
 
 ### 2.2 Write-Only Registers
 
-Registers R0 to R7 keep their TMS9918A functions (MP010A Section 2.2). Registers R11 to R15 exist after the unlock command. Figure 2-1 shows the extended registers; reserved bits must be written as 0.
+Registers R0 to R7 keep their TMS9918A functions (MP010A Section 2.2). Registers R8 to R15 exist after the unlock command. Figure 2-1 shows the extended registers; reserved bits must be written as 0.
 
 **R8 H SCROLL** (D0 = MSB)
 
@@ -191,12 +191,6 @@ Registers R0 to R7 keep their TMS9918A functions (MP010A Section 2.2). Registers
 | D7 | T64 |
 
 **R13** (D0 = MSB)
-
-| Bits | Field |
-|---|---|
-| D0-D7 | RESERVED |
-
-**R14** (D0 = MSB)
 
 | Bits | Field |
 |---|---|

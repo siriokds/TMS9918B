@@ -143,10 +143,10 @@ def build_story(entries):
                 '(scanline interrupt, Section 2.7). Reading S0 clears F; reading S1 clears FL.'),
               H(2, '2.1.5 VDP initialization'),
               P('RESET clears R0, R1, R11 and R12, locks the extended registers and selects status register S0. The palette and '
-                'R8 to R15 are undefined after power-up and must be written before extended modes are used.')]
+                'R8-R10 and R13-R15 are undefined after power-up and must be written before extended modes are used.')]
 
     story += [H(1, '2.2 Write-Only Registers')]
-    story += [P('Registers R0 to R7 keep their TMS9918A functions (MP010A Section 2.2). Registers R11 to R15 exist after the unlock '
+    story += [P('Registers R0 to R7 keep their TMS9918A functions (MP010A Section 2.2). Registers R8 to R15 exist after the unlock '
                 'command. Figure 2-1 shows the extended registers; reserved bits must be written as 0.')]
     figs = [
         ('R8 H SCROLL', [('COLUMNS', 5), ('FINE', 3)]),
@@ -155,7 +155,6 @@ def build_story(entries):
         ('R11 MODE', [('IE1', 1), ('0', 1), ('0', 1), ('0', 1), ('0', 1), ('0', 1), ('MX', 1), ('XE', 1)]),
         ('R12 SCREEN', [('0', 1), ('0', 1), ('0', 1), ('0', 1), ('HLOCK', 1), ('VLOCK', 1), ('MASK', 1), ('T64', 1)]),
         ('R13', [('RESERVED', 8)]),
-        ('R14', [('RESERVED', 8)]),
         ('R14', [('RESERVED', 8)]),
         ('R15 STATUS SEL', [('0', 1), ('0', 1), ('0', 1), ('0', 1), ('STATUS REGISTER NUMBER', 4)]),
     ]

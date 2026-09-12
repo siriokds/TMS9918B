@@ -4,4 +4,5 @@
 
 LESSON_WITH_SPRITES: equ 1
 SPRITE_OVERLAY_LABEL: equ 1     ; the overlay prints the sprite size on a text row
+SPRITE_OVERLAY_R1_BASE: equ 0xC0
         include "include/lesson_legacy_graphics_i.inc"

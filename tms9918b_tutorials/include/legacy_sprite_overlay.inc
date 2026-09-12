@@ -141,7 +141,10 @@ legacy_sprite_overlay_animate:
 
 ; Display on, 16 KiB. Bits 1..0 select size and magnification.
 .r1_values:
-        db 0xC0,0xC2,0xC1,0xC3
+        db SPRITE_OVERLAY_R1_BASE|0x00
+        db SPRITE_OVERLAY_R1_BASE|0x02
+        db SPRITE_OVERLAY_R1_BASE|0x01
+        db SPRITE_OVERLAY_R1_BASE|0x03
 .label_8:         db "SPRITES: 8 X 8 NORMAL",0
 .label_16:        db "SPRITES: 16 X 16 NORMAL",0
 .label_8_double:  db "SPRITES: 8 X 8 DOUBLED",0

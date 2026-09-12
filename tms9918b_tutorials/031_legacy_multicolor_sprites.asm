@@ -5,4 +5,5 @@
 LESSON_WITH_SPRITES: equ 1
 LESSON_THIRDS:       equ 0
 SPRITE_OVERLAY_LABEL: equ 0
+SPRITE_OVERLAY_R1_BASE: equ 0xC8
         include "include/lesson_legacy_multicolor.inc"
